@@ -1,0 +1,116 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  font-family: monospace;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#game-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#game-canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 3px solid #333;
+  background: #000;
+  width: 768px;
+  height: 672px;
+}
+
+#touch-controls {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  padding: 0 20px;
+  justify-content: space-between;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#touch-left, #touch-right {
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.touch-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 20px;
+  font-weight: bold;
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.touch-btn:active {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: #fff;
+}
+
+.touch-btn.action {
+  width: 65px;
+  height: 65px;
+  font-size: 22px;
+}
+
+#btn-jump {
+  border-color: rgba(100, 255, 100, 0.7);
+  color: rgba(100, 255, 100, 0.9);
+}
+
+#btn-dash {
+  border-color: rgba(255, 100, 100, 0.7);
+  color: rgba(255, 100, 100, 0.9);
+}
+
+@media (max-width: 800px) {
+  #game-canvas {
+    width: 100vw;
+    height: calc(100vw * 0.875);
+  }
+
+  #touch-controls {
+    display: flex;
+  }
+}
+
+@media (max-width: 500px) {
+  .touch-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 16px;
+  }
+
+  .touch-btn.action {
+    width: 55px;
+    height: 55px;
+    font-size: 18px;
+  }
+}
