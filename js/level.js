@@ -96,12 +96,24 @@ export class Level {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, viewWidth, viewHeight);
 
-    // Parallax mountains (far layer)
-    this._drawMountains(ctx, camera, 0.1, viewHeight * 0.5, '#1e3a5f', 60);
-    // Parallax hills (mid layer)
-    this._drawMountains(ctx, camera, 0.3, viewHeight * 0.65, '#2d5a27', 40);
-    // Parallax trees (near layer)
-    this._drawTrees(ctx, camera, 0.5, viewHeight * 0.75, '#1a4a1a');
+    // Bright clouds
+    ctx.fillStyle = '#ffffff';
+    for (let i = 0; i < 8; i++) {
+      const cx = ((i * 97 + camera.x * 0.05) % (viewWidth + 60)) - 30;
+      const cy = 20 + (i * 29) % 50;
+      const cw = 20 + (i * 11) % 20;
+      ctx.globalAlpha = 0.5;
+      ctx.fillRect(Math.floor(cx), Math.floor(cy), cw, 6);
+      ctx.fillRect(Math.floor(cx + 4), Math.floor(cy - 3), cw - 8, 4);
+    }
+    ctx.globalAlpha = 1;
+
+    // Parallax hills (far layer) — bright green
+    this._drawMountains(ctx, camera, 0.1, viewHeight * 0.55, '#44bb44', 50);
+    // Parallax hills (mid layer) — medium green
+    this._drawMountains(ctx, camera, 0.3, viewHeight * 0.68, '#33aa33', 35);
+    // Parallax trees (near layer) — cheerful green
+    this._drawTrees(ctx, camera, 0.5, viewHeight * 0.78, '#228822');
   }
 
   _drawMountains(ctx, camera, parallax, baseY, color, height) {

@@ -345,52 +345,66 @@ export class Game {
   }
 
   _drawTitle(ctx) {
-    // Animated background
-    const t = this.titleTimer * 0.02;
+    // Bright, cheerful Press Start! background
     const gradient = ctx.createLinearGradient(0, 0, 0, VIEW_HEIGHT);
-    gradient.addColorStop(0, '#1a1a2e');
-    gradient.addColorStop(0.5, '#16213e');
-    gradient.addColorStop(1, '#0f3460');
+    gradient.addColorStop(0, '#4488ff');
+    gradient.addColorStop(0.5, '#66aaff');
+    gradient.addColorStop(0.8, '#88ccff');
+    gradient.addColorStop(1, '#5ddb5d');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
-    // Stars
-    for (let i = 0; i < 30; i++) {
-      const sx = (i * 73 + this.titleTimer * 0.2) % VIEW_WIDTH;
-      const sy = (i * 37) % (VIEW_HEIGHT * 0.6);
-      const bright = Math.sin(this.titleTimer * 0.05 + i) * 0.3 + 0.7;
-      ctx.fillStyle = `rgba(255,255,255,${bright})`;
-      ctx.fillRect(Math.floor(sx), Math.floor(sy), 1, 1);
+    // Clouds
+    ctx.fillStyle = '#ffffff';
+    for (let i = 0; i < 6; i++) {
+      const cx = ((i * 53 + this.titleTimer * 0.3) % (VIEW_WIDTH + 40)) - 20;
+      const cy = 15 + (i * 23) % 50;
+      const cw = 20 + (i * 7) % 15;
+      ctx.globalAlpha = 0.6;
+      ctx.fillRect(Math.floor(cx), Math.floor(cy), cw, 6);
+      ctx.fillRect(Math.floor(cx + 3), Math.floor(cy - 3), cw - 6, 4);
     }
+    ctx.globalAlpha = 1;
+
+    // Green ground
+    ctx.fillStyle = '#5ddb5d';
+    ctx.fillRect(0, VIEW_HEIGHT - 40, VIEW_WIDTH, 40);
+    ctx.fillStyle = '#3dbd3d';
+    ctx.fillRect(0, VIEW_HEIGHT - 40, VIEW_WIDTH, 3);
+
+    // "PRESS START!" header
+    ctx.fillStyle = '#ff3b3b';
+    ctx.font = 'bold 10px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('PRESS START!', VIEW_WIDTH / 2, 50);
 
     // Title
-    ctx.fillStyle = '#e63946';
-    ctx.font = 'bold 16px monospace';
-    ctx.textAlign = 'center';
     const bounce = Math.sin(this.titleTimer * 0.08) * 3;
-    ctx.fillText('SUPER', VIEW_WIDTH / 2, 60 + bounce);
-    ctx.fillStyle = '#f0f0f0';
-    ctx.font = 'bold 20px monospace';
-    ctx.fillText('RABBIT BOY', VIEW_WIDTH / 2, 82 + bounce);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText('SUPER', VIEW_WIDTH / 2, 72 + bounce);
+    ctx.fillStyle = '#ffe347';
+    ctx.font = 'bold 18px monospace';
+    ctx.fillText('RABBIT BOY', VIEW_WIDTH / 2, 92 + bounce);
 
     // Subtitle
-    ctx.fillStyle = '#fbbf24';
+    ctx.fillStyle = '#ffffff';
     ctx.font = '8px monospace';
-    ctx.fillText('~ The Adventure Begins ~', VIEW_WIDTH / 2, 100);
+    ctx.fillText('vs. King Viking\'s Robot Army!', VIEW_WIDTH / 2, 110);
 
-    // Rabbit sprite preview
-    const rabbitY = 120 + Math.sin(this.titleTimer * 0.06) * 4;
+    // Rabbit sprite preview — bouncing on the grass
+    const rabbitY = VIEW_HEIGHT - 56 + Math.abs(Math.sin(this.titleTimer * 0.08)) * -10;
     this.spriteRenderer.draw(ctx, 'rabbitIdle', VIEW_WIDTH / 2 - 8, rabbitY, 0, false);
 
-    // Press start
+    // Press start prompt
     if (Math.floor(this.titleTimer / 30) % 2 === 0) {
-      ctx.fillStyle = '#fff';
-      ctx.font = '8px monospace';
-      ctx.fillText('PRESS ENTER OR TAP TO START', VIEW_WIDTH / 2, 175);
+      ctx.fillStyle = '#222034';
+      ctx.font = 'bold 8px monospace';
+      ctx.fillText('PRESS ENTER OR TAP TO START', VIEW_WIDTH / 2, 135);
     }
 
     // Controls info
-    ctx.fillStyle = '#888';
+    ctx.fillStyle = '#336699';
     ctx.font = '6px monospace';
     ctx.fillText('ARROWS/WASD: MOVE    SPACE: JUMP', VIEW_WIDTH / 2, 200);
     ctx.fillText('SHIFT: DASH    P/ESC: PAUSE', VIEW_WIDTH / 2, 210);
@@ -490,13 +504,13 @@ export class Game {
     // "WARNING" text
     if (this.stateTimer < 80) {
       const alpha = Math.sin(this.stateTimer * 0.15) * 0.5 + 0.5;
-      ctx.fillStyle = `rgba(239, 68, 68, ${alpha})`;
+      ctx.fillStyle = `rgba(102, 68, 204, ${alpha})`;
       ctx.font = 'bold 12px monospace';
       ctx.textAlign = 'center';
       ctx.fillText('WARNING!', VIEW_WIDTH / 2, 30);
       ctx.font = '8px monospace';
       ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-      ctx.fillText('KING FOX APPROACHES', VIEW_WIDTH / 2, 45);
+      ctx.fillText('KING VIKING APPROACHES!', VIEW_WIDTH / 2, 45);
       ctx.textAlign = 'left';
     }
   }
