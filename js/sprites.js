@@ -1,17 +1,15 @@
-// Programmatic pixel art sprite definitions — Press Start! faithful
-// Each sprite is a 2D array of hex color values (null = transparent)
+// Sprite system — hybrid: procedural cartoon drawing for characters,
+// pixel arrays for tiles and small items.
+// Style: bold outlines, smooth shapes, inspired by children's graphic novels
 
-const C = null; // Clear/transparent
+const C = null;
 
-// Color palette — bright, cheerful Press Start! style
+// Colors
+const BLACK = '#222034';
 const WHITE = '#ffffff';
-const BLACK = '#000000';
 const RABBIT_WHITE = '#f8f8f8';
-const RABBIT_PINK = '#ff7eb3';
-const RABBIT_RED = '#ff3b3b';
+const RABBIT_PINK = '#ffaacc';
 const RABBIT_EYE = '#222034';
-const RABBIT_NOSE = '#ff7eb3';
-const RABBIT_MOUTH = '#ff3b3b';
 const GRASS_TOP = '#5ddb5d';
 const GRASS_DARK = '#3dbd3d';
 const DIRT = '#c4813a';
@@ -29,180 +27,76 @@ const STAR_BRIGHT = '#fff8a0';
 const BRICK = '#e04040';
 const BRICK_DARK = '#b03030';
 const SPRING_GREEN = '#3be8e8';
-
-// Robot colors (King Viking's army)
 const ROBOT_GRAY = '#8899aa';
 const ROBOT_DARK = '#556677';
 const ROBOT_LIGHT = '#aabbcc';
-const ROBOT_RED = '#ff4444';
 const ROBOT_EYE = '#ff3333';
 const ROBOT_BODY = '#667788';
-const ROBOT_RIVET = '#aabbcc';
-
-// Flying robot colors
 const FLY_ROBOT = '#7788cc';
 const FLY_DARK = '#5566aa';
 const FLY_LIGHT = '#99aadd';
 const FLY_PROP = '#ccccdd';
-
-// King Viking colors (Wario-inspired, pink skin, black mustache)
 const VIKING_SKIN = '#ffb899';
 const VIKING_SKIN_DARK = '#e09878';
 const VIKING_HELMET = '#6644cc';
 const VIKING_HELMET_DARK = '#4422aa';
 const VIKING_HORN = '#ddcc44';
-const VIKING_HORN_DARK = '#bbaa22';
 const VIKING_MUSTACHE = '#222034';
-const VIKING_CAPE = '#6644cc';
-const VIKING_CAPE_DARK = '#4422aa';
 const VIKING_SHIRT = '#4488dd';
 const VIKING_BELT = '#ffcc33';
 const VIKING_BOOT = '#4422aa';
 
-// Super Rabbit Boy — idle frame (16x16)
-// Press Start! style: white rabbit, round head, big eyes, pink inner ears
-// Simple, expressive, cheerful pixel art
-const RABBIT_IDLE_1 = [
-  [C,C,C,C,RABBIT_WHITE,C,C,C,C,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_PINK,C,C,C,RABBIT_PINK,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_EYE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_EYE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_PINK,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,RABBIT_RED,RABBIT_RED,C,C,C,RABBIT_RED,RABBIT_RED,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
+// ── Tile pixel arrays (kept as-is for tiles) ──
 
-// Super Rabbit Boy — run frame 1 (legs apart)
-const RABBIT_RUN_1 = [
-  [C,C,C,C,RABBIT_WHITE,C,C,C,C,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_PINK,C,C,C,RABBIT_PINK,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_EYE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_EYE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_PINK,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,C,C,RABBIT_WHITE,C,C,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_RED,C,C,RABBIT_RED,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// Super Rabbit Boy — run frame 2 (legs together)
-const RABBIT_RUN_2 = [
-  [C,C,C,C,RABBIT_WHITE,C,C,C,C,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_PINK,C,C,C,RABBIT_PINK,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_EYE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_EYE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_PINK,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C],
-  [C,C,C,RABBIT_RED,RABBIT_RED,C,C,C,RABBIT_RED,RABBIT_RED,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// Jump frame — ears back, arms up, expressive
-const RABBIT_JUMP = [
-  [C,C,C,RABBIT_WHITE,C,C,C,C,C,C,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_PINK,C,C,C,C,RABBIT_PINK,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_EYE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_EYE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_PINK,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_RED,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,RABBIT_WHITE,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,RABBIT_WHITE,C,C,C,C],
-  [RABBIT_WHITE,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,RABBIT_WHITE,C,C,C],
-  [C,C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C,C,C],
-  [C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,C],
-  [C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C,RABBIT_WHITE,RABBIT_WHITE,C,C,C,C,C],
-  [C,C,RABBIT_RED,RABBIT_RED,C,C,C,C,C,RABBIT_RED,RABBIT_RED,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// Grass tile (16x16) — brighter, more cheerful
 const TILE_GRASS = (() => {
   const t = Array.from({ length: 16 }, () => Array(16).fill(DIRT));
   for (let x = 0; x < 16; x++) {
-    t[0][x] = GRASS_TOP;
-    t[1][x] = GRASS_TOP;
+    t[0][x] = GRASS_TOP; t[1][x] = GRASS_TOP;
     t[2][x] = (x % 3 === 0) ? GRASS_DARK : GRASS_TOP;
     t[3][x] = (x % 5 === 1) ? GRASS_DARK : GRASS_TOP;
   }
-  for (let y = 4; y < 16; y++) {
-    for (let x = 0; x < 16; x++) {
+  for (let y = 4; y < 16; y++)
+    for (let x = 0; x < 16; x++)
       t[y][x] = ((x + y) % 7 === 0) ? DIRT_DARK : DIRT;
-    }
-  }
   return t;
 })();
 
-// Dirt tile
 const TILE_DIRT = (() => {
   const t = Array.from({ length: 16 }, () => Array(16).fill(DIRT));
-  for (let y = 0; y < 16; y++) {
-    for (let x = 0; x < 16; x++) {
+  for (let y = 0; y < 16; y++)
+    for (let x = 0; x < 16; x++)
       if ((x + y) % 7 === 0) t[y][x] = DIRT_DARK;
-    }
-  }
   return t;
 })();
 
-// Stone tile — Viking fortress style
 const TILE_STONE = (() => {
   const t = Array.from({ length: 16 }, () => Array(16).fill(STONE));
-  for (let y = 0; y < 16; y++) {
+  for (let y = 0; y < 16; y++)
     for (let x = 0; x < 16; x++) {
       if ((x * 3 + y * 5) % 11 === 0) t[y][x] = STONE_LIGHT;
       if ((x * 7 + y * 2) % 13 === 0) t[y][x] = STONE_DARK;
     }
-  }
   for (let x = 0; x < 16; x++) { t[7][x] = STONE_DARK; t[15][x] = STONE_DARK; }
-  for (let y = 0; y < 8; y++) { t[y][7] = STONE_DARK; }
+  for (let y = 0; y < 8; y++) t[y][7] = STONE_DARK;
   for (let y = 8; y < 16; y++) { t[y][0] = STONE_DARK; t[y][15] = STONE_DARK; }
   return t;
 })();
 
-// Breakable brick tile
 const TILE_BRICK = (() => {
   const t = Array.from({ length: 16 }, () => Array(16).fill(BRICK));
   for (let x = 0; x < 16; x++) { t[3][x] = BRICK_DARK; t[7][x] = BRICK_DARK; t[11][x] = BRICK_DARK; t[15][x] = BRICK_DARK; }
-  for (let y = 0; y < 4; y++) { t[y][7] = BRICK_DARK; }
+  for (let y = 0; y < 4; y++) t[y][7] = BRICK_DARK;
   for (let y = 4; y < 8; y++) { t[y][3] = BRICK_DARK; t[y][11] = BRICK_DARK; }
-  for (let y = 8; y < 12; y++) { t[y][7] = BRICK_DARK; }
+  for (let y = 8; y < 12; y++) t[y][7] = BRICK_DARK;
   for (let y = 12; y < 16; y++) { t[y][3] = BRICK_DARK; t[y][11] = BRICK_DARK; }
   return t;
 })();
 
-// Platform tile
 const TILE_PLATFORM = (() => {
   const t = Array.from({ length: 16 }, () => Array(16).fill(C));
   for (let x = 0; x < 16; x++) {
-    t[0][x] = PLATFORM;
-    t[1][x] = PLATFORM;
-    t[2][x] = PLATFORM_LIGHT;
-    t[3][x] = PLATFORM;
+    t[0][x] = PLATFORM; t[1][x] = PLATFORM;
+    t[2][x] = PLATFORM_LIGHT; t[3][x] = PLATFORM;
   }
   for (let y = 4; y < 16; y++) {
     t[y][2] = PLATFORM; t[y][3] = PLATFORM_LIGHT;
@@ -211,172 +105,12 @@ const TILE_PLATFORM = (() => {
   return t;
 })();
 
-// Carrot collectible (16x16) — brighter
-const SPRITE_CARROT = [
-  [C,C,C,C,C,C,C,CARROT_GREEN,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,CARROT_GREEN,CARROT_GREEN,CARROT_GREEN,C,C,C,C,C,C,C],
-  [C,C,C,C,C,CARROT_GREEN,C,CARROT_GREEN,C,CARROT_GREEN,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,CARROT_ORANGE,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,CARROT_ORANGE,CARROT_ORANGE,CARROT_ORANGE,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,CARROT_ORANGE,CARROT_ORANGE,CARROT_ORANGE,C,C,C,C,C,C,C],
-  [C,C,C,C,C,CARROT_ORANGE,CARROT_ORANGE,CARROT_ORANGE,CARROT_ORANGE,CARROT_ORANGE,C,C,C,C,C,C],
-  [C,C,C,C,C,CARROT_ORANGE,CARROT_ORANGE,CARROT_ORANGE,CARROT_ORANGE,CARROT_ORANGE,C,C,C,C,C,C],
-  [C,C,C,C,C,CARROT_ORANGE,CARROT_ORANGE,'#ffc060',CARROT_ORANGE,CARROT_ORANGE,C,C,C,C,C,C],
-  [C,C,C,C,C,C,CARROT_ORANGE,CARROT_ORANGE,CARROT_ORANGE,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,CARROT_ORANGE,CARROT_ORANGE,CARROT_ORANGE,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,CARROT_ORANGE,'#ffc060',CARROT_ORANGE,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,CARROT_ORANGE,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,CARROT_ORANGE,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// Heart
-const SPRITE_HEART = [
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,HEART_RED,HEART_RED,C,C,HEART_RED,HEART_RED,C,C,C,C,C,C,C,C],
-  [C,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,C,C,C,C,C,C,C],
-  [C,HEART_RED,HEART_RED,'#ff9999',HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,C,C,C,C,C,C,C],
-  [C,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,C,C,C,C,C,C,C],
-  [C,C,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,C,C,C,C,C,C,C,C],
-  [C,C,C,HEART_RED,HEART_RED,HEART_RED,HEART_RED,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,HEART_RED,HEART_RED,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// Star power-up — Super Carrot (special power carrot from the books)
-const SPRITE_STAR = [
-  [C,C,C,C,C,C,C,STAR_YELLOW,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,STAR_YELLOW,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,C,C,C,C,C,C,C],
-  [C,C,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_BRIGHT,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,C,C,C,C],
-  [C,C,C,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_BRIGHT,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,C,C,C,C,C],
-  [C,C,C,C,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,C,C,C,C,C,C],
-  [C,C,C,C,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,C,C,C,C,C,C],
-  [C,C,C,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,C,C,STAR_YELLOW,STAR_YELLOW,STAR_YELLOW,C,C,C,C,C],
-  [C,C,C,STAR_YELLOW,STAR_YELLOW,C,C,C,C,STAR_YELLOW,STAR_YELLOW,C,C,C,C,C],
-  [C,C,STAR_YELLOW,STAR_YELLOW,C,C,C,C,C,C,STAR_YELLOW,STAR_YELLOW,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// Speed boost power-up (boot)
-const SPRITE_SPEED = [
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,SPRING_GREEN,SPRING_GREEN,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,C,C,C,C,C,C,C,C,C],
-  [C,C,C,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,C,C,C,C,C,C,C,C,C],
-  [C,C,C,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,C,C,C,C,C,C,C,C,C],
-  [C,C,C,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,C,C,C,C,C,C,C,C],
-  [C,C,C,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,C,C,C,C,C,C],
-  [C,C,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,C,C,C,C,C],
-  [C,C,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,SPRING_GREEN,C,C,C,C,C],
-  [C,C,C,'#0e8888','#0e8888','#0e8888','#0e8888','#0e8888','#0e8888','#0e8888',C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// Robot enemy (ground patrol) — King Viking's robot minion (16x16)
-const SPRITE_ROBOT = [
-  [C,C,C,C,C,C,ROBOT_RED,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,ROBOT_GRAY,ROBOT_LIGHT,ROBOT_GRAY,C,C,C,C,C,C,C,C],
-  [C,C,C,C,ROBOT_GRAY,ROBOT_GRAY,ROBOT_GRAY,ROBOT_GRAY,ROBOT_GRAY,C,C,C,C,C,C,C],
-  [C,C,C,ROBOT_GRAY,ROBOT_GRAY,ROBOT_GRAY,ROBOT_GRAY,ROBOT_GRAY,ROBOT_GRAY,ROBOT_GRAY,C,C,C,C,C,C],
-  [C,C,C,ROBOT_GRAY,ROBOT_EYE,ROBOT_GRAY,ROBOT_GRAY,ROBOT_GRAY,ROBOT_EYE,ROBOT_GRAY,C,C,C,C,C,C],
-  [C,C,C,ROBOT_GRAY,ROBOT_EYE,ROBOT_GRAY,ROBOT_GRAY,ROBOT_GRAY,ROBOT_EYE,ROBOT_GRAY,C,C,C,C,C,C],
-  [C,C,C,ROBOT_DARK,ROBOT_DARK,ROBOT_DARK,ROBOT_DARK,ROBOT_DARK,ROBOT_DARK,ROBOT_DARK,C,C,C,C,C,C],
-  [C,C,C,C,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,C,C,C,C,C,C,C],
-  [C,C,ROBOT_GRAY,ROBOT_BODY,ROBOT_BODY,ROBOT_RIVET,ROBOT_BODY,ROBOT_RIVET,ROBOT_BODY,ROBOT_GRAY,C,C,C,C,C,C],
-  [C,C,ROBOT_GRAY,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,ROBOT_GRAY,C,C,C,C,C,C],
-  [C,C,C,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,C,C,C,C,C,C,C],
-  [C,C,C,C,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,ROBOT_BODY,C,C,C,C,C,C,C,C],
-  [C,C,C,C,ROBOT_DARK,ROBOT_DARK,ROBOT_DARK,ROBOT_DARK,C,C,C,C,C,C,C,C],
-  [C,C,C,ROBOT_DARK,ROBOT_DARK,C,C,ROBOT_DARK,ROBOT_DARK,C,C,C,C,C,C,C],
-  [C,C,C,ROBOT_DARK,ROBOT_DARK,C,C,ROBOT_DARK,ROBOT_DARK,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// Flying Robot enemy (16x16) — propeller drone
-const SPRITE_FLY_ROBOT = [
-  [C,C,FLY_PROP,FLY_PROP,FLY_PROP,FLY_PROP,FLY_PROP,FLY_PROP,FLY_PROP,FLY_PROP,FLY_PROP,C,C,C,C,C],
-  [C,C,C,C,C,C,FLY_DARK,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,FLY_ROBOT,FLY_LIGHT,FLY_ROBOT,C,C,C,C,C,C,C,C],
-  [C,C,C,C,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,C,C,C,C,C,C,C],
-  [C,C,C,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,C,C,C,C,C,C],
-  [C,C,C,FLY_ROBOT,ROBOT_EYE,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,ROBOT_EYE,FLY_ROBOT,C,C,C,C,C,C],
-  [C,C,C,FLY_ROBOT,ROBOT_EYE,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,ROBOT_EYE,FLY_ROBOT,C,C,C,C,C,C],
-  [C,C,C,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,C,C,C,C,C,C],
-  [C,C,C,C,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,C,C,C,C,C,C,C],
-  [C,C,C,C,C,FLY_DARK,FLY_DARK,FLY_DARK,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,FLY_DARK,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// Flying Robot — propeller spin alternate frame
-const SPRITE_FLY_ROBOT_UP = [
-  [C,C,C,C,FLY_PROP,FLY_PROP,FLY_PROP,FLY_PROP,FLY_PROP,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,FLY_DARK,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,FLY_ROBOT,FLY_LIGHT,FLY_ROBOT,C,C,C,C,C,C,C,C],
-  [C,C,C,C,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,C,C,C,C,C,C,C],
-  [C,C,C,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,C,C,C,C,C,C],
-  [C,C,C,FLY_ROBOT,ROBOT_EYE,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,ROBOT_EYE,FLY_ROBOT,C,C,C,C,C,C],
-  [C,C,C,FLY_ROBOT,ROBOT_EYE,FLY_ROBOT,FLY_ROBOT,FLY_ROBOT,ROBOT_EYE,FLY_ROBOT,C,C,C,C,C,C],
-  [C,C,C,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,C,C,C,C,C,C],
-  [C,C,C,C,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,FLY_DARK,C,C,C,C,C,C,C],
-  [C,C,C,C,C,FLY_DARK,FLY_DARK,FLY_DARK,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,FLY_DARK,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// King Viking boss (16x16, rendered at 2x) — purple helmet, horns, pink skin, black mustache
-const SPRITE_KING_VIKING = [
-  [C,VIKING_HORN,C,C,C,VIKING_HELMET,VIKING_HELMET,VIKING_HELMET,C,C,C,VIKING_HORN,C,C,C,C],
-  [C,VIKING_HORN_DARK,C,C,VIKING_HELMET,VIKING_HELMET,VIKING_HELMET,VIKING_HELMET,VIKING_HELMET,C,C,VIKING_HORN_DARK,C,C,C,C],
-  [C,C,C,VIKING_HELMET,VIKING_HELMET,VIKING_HELMET,VIKING_HELMET,VIKING_HELMET,VIKING_HELMET,VIKING_HELMET,C,C,C,C,C,C],
-  [C,C,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,C,C,C,C,C],
-  [C,C,VIKING_SKIN,VIKING_SKIN,RABBIT_EYE,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,RABBIT_EYE,VIKING_SKIN,VIKING_SKIN,C,C,C,C,C],
-  [C,C,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN_DARK,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,C,C,C,C,C],
-  [C,C,C,VIKING_MUSTACHE,VIKING_MUSTACHE,VIKING_MUSTACHE,VIKING_MUSTACHE,VIKING_MUSTACHE,VIKING_MUSTACHE,VIKING_MUSTACHE,C,C,C,C,C,C],
-  [C,C,C,C,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,C,C,C,C,C,C,C],
-  [C,C,VIKING_CAPE,VIKING_SHIRT,VIKING_SHIRT,VIKING_SHIRT,VIKING_SHIRT,VIKING_SHIRT,VIKING_SHIRT,VIKING_CAPE,C,C,C,C,C,C],
-  [C,VIKING_CAPE,VIKING_CAPE,VIKING_SHIRT,VIKING_SHIRT,VIKING_BELT,VIKING_BELT,VIKING_SHIRT,VIKING_SHIRT,VIKING_CAPE,VIKING_CAPE,C,C,C,C,C],
-  [C,VIKING_CAPE_DARK,C,VIKING_SHIRT,VIKING_SHIRT,VIKING_SHIRT,VIKING_SHIRT,VIKING_SHIRT,VIKING_SHIRT,C,VIKING_CAPE_DARK,C,C,C,C,C],
-  [C,C,C,C,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,VIKING_SKIN,C,C,C,C,C,C,C,C],
-  [C,C,C,VIKING_BOOT,VIKING_BOOT,VIKING_BOOT,C,VIKING_BOOT,VIKING_BOOT,VIKING_BOOT,C,C,C,C,C,C],
-  [C,C,C,VIKING_BOOT,VIKING_BOOT,VIKING_BOOT,C,VIKING_BOOT,VIKING_BOOT,VIKING_BOOT,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-  [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
-];
-
-// Checkpoint flag (16x16)
+// Checkpoint flag pixel array
 const SPRITE_CHECKPOINT = [
-  [C,C,C,RABBIT_RED,RABBIT_RED,RABBIT_RED,RABBIT_RED,RABBIT_RED,C,C,C,C,C,C,C,C],
-  [C,C,C,RABBIT_RED,RABBIT_RED,RABBIT_RED,RABBIT_RED,RABBIT_RED,C,C,C,C,C,C,C,C],
-  [C,C,C,RABBIT_RED,RABBIT_RED,'#ff9999',RABBIT_RED,RABBIT_RED,C,C,C,C,C,C,C,C],
-  [C,C,C,RABBIT_RED,RABBIT_RED,RABBIT_RED,RABBIT_RED,C,C,C,C,C,C,C,C,C],
+  [C,C,C,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,C,C,C,C,C,C,C,C],
+  [C,C,C,HEART_RED,HEART_RED,HEART_RED,HEART_RED,HEART_RED,C,C,C,C,C,C,C,C],
+  [C,C,C,HEART_RED,HEART_RED,'#ff9999',HEART_RED,HEART_RED,C,C,C,C,C,C,C,C],
+  [C,C,C,HEART_RED,HEART_RED,HEART_RED,HEART_RED,C,C,C,C,C,C,C,C,C],
   [C,C,C,STONE,C,C,C,C,C,C,C,C,C,C,C,C],
   [C,C,C,STONE,C,C,C,C,C,C,C,C,C,C,C,C],
   [C,C,C,STONE,C,C,C,C,C,C,C,C,C,C,C,C],
@@ -391,44 +125,469 @@ const SPRITE_CHECKPOINT = [
   [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
 ];
 
-// Sprite cache for pre-rendered canvases
+// ── Procedural draw functions for characters ──
+// These draw smooth, outlined cartoon-style characters using Canvas 2D
+
+function drawRabbitIdle(ctx, flipX) {
+  ctx.save();
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16, 0); }
+  const o = BLACK; // outline
+  const w = RABBIT_WHITE;
+  const p = RABBIT_PINK;
+  const e = RABBIT_EYE;
+
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = o;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+
+  // Left ear
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(5, 3, 1.5, 4, -0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = p;
+  ctx.beginPath(); ctx.ellipse(5, 3, 0.7, 2.5, -0.15, 0, Math.PI * 2); ctx.fill();
+
+  // Right ear
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(11, 3, 1.5, 4, 0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = p;
+  ctx.beginPath(); ctx.ellipse(11, 3, 0.7, 2.5, 0.15, 0, Math.PI * 2); ctx.fill();
+
+  // Head
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(8, 8, 5, 4.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Eyes
+  ctx.fillStyle = e;
+  ctx.beginPath(); ctx.ellipse(6, 7.5, 1, 1.3, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10, 7.5, 1, 1.3, 0, 0, Math.PI * 2); ctx.fill();
+  // Eye shine
+  ctx.fillStyle = WHITE;
+  ctx.beginPath(); ctx.arc(6.5, 7, 0.4, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(10.5, 7, 0.4, 0, Math.PI * 2); ctx.fill();
+
+  // Nose
+  ctx.fillStyle = p;
+  ctx.beginPath(); ctx.ellipse(8, 9, 0.6, 0.4, 0, 0, Math.PI * 2); ctx.fill();
+
+  // Mouth — small smile
+  ctx.strokeStyle = o;
+  ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.arc(8, 9.5, 1.2, 0.2, Math.PI - 0.2); ctx.stroke();
+
+  // Body
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = o;
+  ctx.fillStyle = w;
+  ctx.beginPath();
+  ctx.ellipse(8, 13, 3.5, 3, 0, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+
+  // Tail (little circle on back)
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.arc(12, 13, 1.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Left leg
+  ctx.fillStyle = w;
+  ctx.beginPath();
+  ctx.ellipse(6, 15.5, 1.8, 1, 0, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+
+  // Right leg
+  ctx.fillStyle = w;
+  ctx.beginPath();
+  ctx.ellipse(10, 15.5, 1.8, 1, 0, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawRabbitRun(ctx, frame, flipX) {
+  ctx.save();
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16, 0); }
+  const o = BLACK, w = RABBIT_WHITE, p = RABBIT_PINK, e = RABBIT_EYE;
+  ctx.lineWidth = 1.2; ctx.strokeStyle = o; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+
+  // Ears tilted back
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(4, 2.5, 1.5, 3.5, -0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = p;
+  ctx.beginPath(); ctx.ellipse(4, 2.5, 0.7, 2, -0.4, 0, Math.PI * 2); ctx.fill();
+
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(10, 2.5, 1.5, 3.5, 0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = p;
+  ctx.beginPath(); ctx.ellipse(10, 2.5, 0.7, 2, 0.1, 0, Math.PI * 2); ctx.fill();
+
+  // Head (slightly forward)
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(8, 7.5, 5, 4.2, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Determined eyes
+  ctx.fillStyle = e;
+  ctx.beginPath(); ctx.ellipse(6, 7, 1, 1.2, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10, 7, 1, 1.2, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = WHITE;
+  ctx.beginPath(); ctx.arc(6.5, 6.5, 0.4, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(10.5, 6.5, 0.4, 0, Math.PI * 2); ctx.fill();
+
+  // Nose
+  ctx.fillStyle = p;
+  ctx.beginPath(); ctx.ellipse(8, 8.5, 0.6, 0.4, 0, 0, Math.PI * 2); ctx.fill();
+
+  // Smile
+  ctx.strokeStyle = o; ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.arc(8, 9, 1, 0.2, Math.PI - 0.2); ctx.stroke();
+
+  // Body leaning forward
+  ctx.lineWidth = 1.2; ctx.strokeStyle = o;
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(8, 12.5, 3.5, 2.8, 0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Tail
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.arc(12.5, 12, 1.3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Legs — alternating
+  const legOffset = frame === 0 ? 1.5 : -1.5;
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(6 - legOffset * 0.3, 15.5, 2, 1, legOffset * 0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(10 + legOffset * 0.3, 15.5, 2, 1, -legOffset * 0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawRabbitJump(ctx, flipX) {
+  ctx.save();
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16, 0); }
+  const o = BLACK, w = RABBIT_WHITE, p = RABBIT_PINK, e = RABBIT_EYE;
+  ctx.lineWidth = 1.2; ctx.strokeStyle = o; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+
+  // Ears straight up, spread
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(4, 2, 1.5, 4, -0.25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = p;
+  ctx.beginPath(); ctx.ellipse(4, 2, 0.7, 2.5, -0.25, 0, Math.PI * 2); ctx.fill();
+
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(12, 2, 1.5, 4, 0.25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = p;
+  ctx.beginPath(); ctx.ellipse(12, 2, 0.7, 2.5, 0.25, 0, Math.PI * 2); ctx.fill();
+
+  // Head
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(8, 7.5, 5, 4.2, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Excited eyes (wider)
+  ctx.fillStyle = e;
+  ctx.beginPath(); ctx.ellipse(6, 7, 1.1, 1.5, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10, 7, 1.1, 1.5, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = WHITE;
+  ctx.beginPath(); ctx.arc(6.6, 6.3, 0.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(10.6, 6.3, 0.5, 0, Math.PI * 2); ctx.fill();
+
+  ctx.fillStyle = p;
+  ctx.beginPath(); ctx.ellipse(8, 8.5, 0.6, 0.4, 0, 0, Math.PI * 2); ctx.fill();
+
+  // Open mouth — excited
+  ctx.fillStyle = '#ff6688';
+  ctx.beginPath(); ctx.ellipse(8, 9.8, 1.5, 1, 0, 0, Math.PI); ctx.fill();
+  ctx.strokeStyle = o; ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.ellipse(8, 9.8, 1.5, 1, 0, 0, Math.PI); ctx.stroke();
+
+  // Body (compact for jump)
+  ctx.lineWidth = 1.2; ctx.strokeStyle = o;
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(8, 12.5, 3.2, 2.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Arms out
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(2.5, 10.5, 1.5, 1, -0.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(13.5, 10.5, 1.5, 1, 0.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Legs tucked
+  ctx.fillStyle = w;
+  ctx.beginPath(); ctx.ellipse(6, 15, 2, 1, -0.3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(10, 15, 2, 1, 0.3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  ctx.restore();
+}
+
+// ── Robot enemy (ground) — cartoon style ──
+function drawRobot(ctx, flipX) {
+  ctx.save();
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16, 0); }
+  ctx.lineWidth = 1.2; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
+
+  // Antenna
+  ctx.strokeStyle = ROBOT_DARK; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(8, 1); ctx.lineTo(8, 3); ctx.stroke();
+  ctx.fillStyle = ROBOT_EYE;
+  ctx.beginPath(); ctx.arc(8, 1, 1, 0, Math.PI * 2); ctx.fill();
+
+  // Head
+  ctx.strokeStyle = BLACK; ctx.lineWidth = 1.2;
+  ctx.fillStyle = ROBOT_GRAY;
+  ctx.beginPath();
+  ctx.roundRect(3, 3, 10, 7, 2);
+  ctx.fill(); ctx.stroke();
+
+  // Eyes
+  ctx.fillStyle = ROBOT_EYE;
+  ctx.beginPath(); ctx.arc(5.5, 6, 1.2, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(10.5, 6, 1.2, 0, Math.PI * 2); ctx.fill();
+  // Eye glow
+  ctx.fillStyle = '#ff8888';
+  ctx.beginPath(); ctx.arc(5.8, 5.6, 0.4, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(10.8, 5.6, 0.4, 0, Math.PI * 2); ctx.fill();
+
+  // Mouth slit
+  ctx.strokeStyle = ROBOT_DARK; ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.moveTo(5.5, 8.5); ctx.lineTo(10.5, 8.5); ctx.stroke();
+
+  // Body
+  ctx.strokeStyle = BLACK; ctx.lineWidth = 1.2;
+  ctx.fillStyle = ROBOT_BODY;
+  ctx.beginPath();
+  ctx.roundRect(4, 10, 8, 5, 1);
+  ctx.fill(); ctx.stroke();
+
+  // Rivets
+  ctx.fillStyle = ROBOT_LIGHT;
+  ctx.beginPath(); ctx.arc(6, 12, 0.6, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(10, 12, 0.6, 0, Math.PI * 2); ctx.fill();
+
+  // Legs
+  ctx.fillStyle = ROBOT_DARK;
+  ctx.fillRect(5, 15, 2, 1); ctx.strokeRect(5, 15, 2, 1);
+  ctx.fillRect(9, 15, 2, 1); ctx.strokeRect(9, 15, 2, 1);
+
+  ctx.restore();
+}
+
+// ── Flying robot ──
+function drawFlyRobot(ctx, frame, flipX) {
+  ctx.save();
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16, 0); }
+  ctx.lineWidth = 1; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
+
+  // Propeller
+  const propW = frame === 0 ? 10 : 6;
+  ctx.fillStyle = FLY_PROP;
+  ctx.fillRect(8 - propW / 2, 0, propW, 1.5);
+  ctx.strokeRect(8 - propW / 2, 0, propW, 1.5);
+
+  // Shaft
+  ctx.fillStyle = FLY_DARK;
+  ctx.fillRect(7.5, 1.5, 1, 1.5);
+
+  // Body
+  ctx.lineWidth = 1.2;
+  ctx.fillStyle = FLY_ROBOT;
+  ctx.beginPath(); ctx.ellipse(8, 6, 4.5, 3.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Eyes
+  ctx.fillStyle = ROBOT_EYE;
+  ctx.beginPath(); ctx.arc(6, 5.5, 1, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(10, 5.5, 1, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#ff8888';
+  ctx.beginPath(); ctx.arc(6.3, 5.2, 0.3, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(10.3, 5.2, 0.3, 0, Math.PI * 2); ctx.fill();
+
+  // Bottom
+  ctx.fillStyle = FLY_DARK;
+  ctx.beginPath(); ctx.ellipse(8, 9, 2, 1, 0, 0, Math.PI); ctx.fill(); ctx.stroke();
+
+  ctx.restore();
+}
+
+// ── King Viking boss ──
+function drawKingViking(ctx, flipX, scale) {
+  ctx.save();
+  const s = scale;
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16 * s, 0); }
+  ctx.scale(s, s);
+  ctx.lineWidth = 1.2 / s * 1.2; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+
+  // Horns
+  ctx.fillStyle = VIKING_HORN;
+  ctx.beginPath();
+  ctx.moveTo(1, 4); ctx.lineTo(0, 0); ctx.lineTo(3, 3);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(15, 4); ctx.lineTo(16, 0); ctx.lineTo(13, 3);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+
+  // Helmet
+  ctx.fillStyle = VIKING_HELMET;
+  ctx.beginPath();
+  ctx.roundRect(2, 2, 12, 4, 1.5);
+  ctx.fill(); ctx.stroke();
+  // Helmet band
+  ctx.fillStyle = VIKING_BELT;
+  ctx.fillRect(3, 5, 10, 1.2);
+
+  // Face
+  ctx.fillStyle = VIKING_SKIN;
+  ctx.beginPath(); ctx.ellipse(8, 8.5, 5, 3.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+  // Eyes (angry)
+  ctx.fillStyle = RABBIT_EYE;
+  ctx.beginPath(); ctx.ellipse(5.5, 7.8, 1, 1.2, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(10.5, 7.8, 1, 1.2, 0, 0, Math.PI * 2); ctx.fill();
+  // Angry eyebrows
+  ctx.strokeStyle = BLACK; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(4, 6.5); ctx.lineTo(7, 6.8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(12, 6.5); ctx.lineTo(9, 6.8); ctx.stroke();
+
+  // Big nose
+  ctx.fillStyle = VIKING_SKIN_DARK;
+  ctx.beginPath(); ctx.ellipse(8, 9, 1.2, 0.8, 0, 0, Math.PI * 2); ctx.fill();
+
+  // Mustache
+  ctx.fillStyle = VIKING_MUSTACHE;
+  ctx.beginPath();
+  ctx.moveTo(4, 10); ctx.quadraticCurveTo(6, 11.5, 8, 10);
+  ctx.quadraticCurveTo(10, 11.5, 12, 10);
+  ctx.quadraticCurveTo(10, 10.5, 8, 10.5);
+  ctx.quadraticCurveTo(6, 10.5, 4, 10);
+  ctx.fill();
+
+  // Body
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = BLACK;
+  ctx.fillStyle = VIKING_SHIRT;
+  ctx.beginPath();
+  ctx.roundRect(3, 11.5, 10, 5, 1);
+  ctx.fill(); ctx.stroke();
+
+  // Belt
+  ctx.fillStyle = VIKING_BELT;
+  ctx.fillRect(4, 14, 8, 1.5);
+  ctx.strokeRect(4, 14, 8, 1.5);
+
+  // Boots
+  ctx.fillStyle = VIKING_BOOT;
+  ctx.beginPath(); ctx.roundRect(3.5, 16.5, 3.5, 2, 0.8); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.roundRect(9, 16.5, 3.5, 2, 0.8); ctx.fill(); ctx.stroke();
+
+  ctx.restore();
+}
+
+// ── Item draw functions ──
+function drawCarrot(ctx) {
+  ctx.lineWidth = 1; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
+  // Green top
+  ctx.fillStyle = CARROT_GREEN;
+  ctx.beginPath();
+  ctx.moveTo(6, 4); ctx.quadraticCurveTo(4, 1, 5, 0);
+  ctx.moveTo(8, 4); ctx.quadraticCurveTo(8, 0, 8, 0);
+  ctx.moveTo(10, 4); ctx.quadraticCurveTo(12, 1, 11, 0);
+  ctx.lineWidth = 1.5; ctx.strokeStyle = CARROT_GREEN; ctx.stroke();
+  // Body
+  ctx.lineWidth = 1; ctx.strokeStyle = BLACK;
+  ctx.fillStyle = CARROT_ORANGE;
+  ctx.beginPath();
+  ctx.moveTo(5, 4); ctx.lineTo(11, 4); ctx.lineTo(8, 14); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  // Highlight
+  ctx.strokeStyle = '#ffc060'; ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.moveTo(7.5, 6); ctx.lineTo(8, 10); ctx.stroke();
+}
+
+function drawHeart(ctx) {
+  ctx.lineWidth = 1; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
+  ctx.fillStyle = HEART_RED;
+  ctx.beginPath();
+  ctx.moveTo(8, 12);
+  ctx.bezierCurveTo(8, 10, 3, 6, 3, 4);
+  ctx.bezierCurveTo(3, 1, 8, 1, 8, 4);
+  ctx.bezierCurveTo(8, 1, 13, 1, 13, 4);
+  ctx.bezierCurveTo(13, 6, 8, 10, 8, 12);
+  ctx.fill(); ctx.stroke();
+  // Shine
+  ctx.fillStyle = '#ff9999';
+  ctx.beginPath(); ctx.arc(5.5, 4, 1, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawStar(ctx) {
+  ctx.lineWidth = 1; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
+  ctx.fillStyle = STAR_YELLOW;
+  ctx.beginPath();
+  for (let i = 0; i < 5; i++) {
+    const a = (i * 72 - 90) * Math.PI / 180;
+    const a2 = ((i * 72) + 36 - 90) * Math.PI / 180;
+    ctx.lineTo(8 + Math.cos(a) * 5, 7 + Math.sin(a) * 5);
+    ctx.lineTo(8 + Math.cos(a2) * 2.2, 7 + Math.sin(a2) * 2.2);
+  }
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = STAR_BRIGHT;
+  ctx.beginPath(); ctx.arc(7, 5.5, 1.2, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawSpeed(ctx) {
+  ctx.lineWidth = 1; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
+  ctx.fillStyle = SPRING_GREEN;
+  // Boot shape
+  ctx.beginPath();
+  ctx.moveTo(5, 3); ctx.lineTo(7, 3); ctx.lineTo(7, 8); ctx.lineTo(12, 8);
+  ctx.lineTo(12, 12); ctx.lineTo(3, 12); ctx.lineTo(3, 8); ctx.lineTo(5, 8);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  // Sole
+  ctx.fillStyle = '#0e8888';
+  ctx.fillRect(3, 11, 9, 1.5);
+  ctx.strokeRect(3, 11, 9, 1.5);
+  // Speed lines
+  ctx.strokeStyle = '#88ffff'; ctx.lineWidth = 0.7;
+  ctx.beginPath(); ctx.moveTo(0, 7); ctx.lineTo(2, 7); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, 9); ctx.lineTo(2.5, 9); ctx.stroke();
+}
+
+// ── Sprite cache ──
 const spriteCache = new Map();
 
 export class SpriteRenderer {
   constructor() {
-    this.sprites = {
-      rabbitIdle: [RABBIT_IDLE_1],
-      rabbitRun: [RABBIT_RUN_1, RABBIT_RUN_2],
-      rabbitJump: [RABBIT_JUMP],
+    // Pixel-array sprites (tiles)
+    this.tileSprites = {
       tileGrass: TILE_GRASS,
       tileDirt: TILE_DIRT,
       tileStone: TILE_STONE,
       tileBrick: TILE_BRICK,
       tilePlatform: TILE_PLATFORM,
-      carrot: SPRITE_CARROT,
-      heart: SPRITE_HEART,
-      star: SPRITE_STAR,
-      speed: SPRITE_SPEED,
-      fox: [SPRITE_ROBOT],
-      bird: [SPRITE_FLY_ROBOT, SPRITE_FLY_ROBOT_UP],
-      kingFox: [SPRITE_KING_VIKING],
       checkpoint: SPRITE_CHECKPOINT,
+    };
+
+    // Procedural character sprites (drawn with Canvas 2D)
+    this.proceduralSprites = {
+      rabbitIdle: { frames: 1, draw: (ctx, frame, flipX) => drawRabbitIdle(ctx, flipX) },
+      rabbitRun: { frames: 2, draw: (ctx, frame, flipX) => drawRabbitRun(ctx, frame, flipX) },
+      rabbitJump: { frames: 1, draw: (ctx, frame, flipX) => drawRabbitJump(ctx, flipX) },
+      fox: { frames: 1, draw: (ctx, frame, flipX) => drawRobot(ctx, flipX) },
+      bird: { frames: 2, draw: (ctx, frame, flipX) => drawFlyRobot(ctx, frame, flipX) },
+      kingFox: { frames: 1, draw: (ctx, frame, flipX, scale) => drawKingViking(ctx, flipX, scale) },
+      carrot: { frames: 1, draw: (ctx) => drawCarrot(ctx) },
+      heart: { frames: 1, draw: (ctx) => drawHeart(ctx) },
+      star: { frames: 1, draw: (ctx) => drawStar(ctx) },
+      speed: { frames: 1, draw: (ctx) => drawSpeed(ctx) },
+    };
+
+    // Backwards-compat: unified sprites map for getSize
+    this.sprites = {
+      ...Object.fromEntries(Object.entries(this.tileSprites)),
     };
   }
 
-  // Pre-render a pixel art sprite to an offscreen canvas
-  _renderToCanvas(spriteData, scale = 1, flipX = false) {
-    const key = JSON.stringify(spriteData) + scale + flipX;
+  _renderTileToCanvas(spriteData, scale = 1, flipX = false) {
+    const key = 'tile_' + JSON.stringify(spriteData) + scale + flipX;
     if (spriteCache.has(key)) return spriteCache.get(key);
 
-    const h = spriteData.length;
-    const w = spriteData[0].length;
+    const h = spriteData.length, w = spriteData[0].length;
     const canvas = document.createElement('canvas');
-    canvas.width = w * scale;
-    canvas.height = h * scale;
+    canvas.width = w * scale; canvas.height = h * scale;
     const ctx = canvas.getContext('2d');
 
-    for (let y = 0; y < h; y++) {
+    for (let y = 0; y < h; y++)
       for (let x = 0; x < w; x++) {
         const color = spriteData[y][x];
         if (color) {
@@ -437,30 +596,51 @@ export class SpriteRenderer {
           ctx.fillRect(drawX, y * scale, scale, scale);
         }
       }
-    }
 
     spriteCache.set(key, canvas);
     return canvas;
   }
 
-  // Draw a sprite at the given position (in game pixels, before camera transform)
+  _renderProceduralToCanvas(name, frame, flipX, scale) {
+    const key = `proc_${name}_${frame}_${flipX}_${scale}`;
+    if (spriteCache.has(key)) return spriteCache.get(key);
+
+    const spec = this.proceduralSprites[name];
+    if (!spec) return null;
+
+    const size = name === 'kingFox' ? 16 * scale : 16;
+    const canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    spec.draw(ctx, frame, flipX, scale);
+
+    spriteCache.set(key, canvas);
+    return canvas;
+  }
+
   draw(ctx, name, x, y, frame = 0, flipX = false, scale = 1) {
-    const spriteData = Array.isArray(this.sprites[name])
-      ? (Array.isArray(this.sprites[name][0]?.[0]) ? this.sprites[name][frame] : this.sprites[name])
-      : this.sprites[name];
+    // Procedural sprite?
+    if (this.proceduralSprites[name]) {
+      const canvas = this._renderProceduralToCanvas(name, frame, flipX, scale);
+      if (canvas) ctx.drawImage(canvas, Math.floor(x), Math.floor(y));
+      return;
+    }
 
+    // Tile/pixel sprite
+    const spriteData = this.tileSprites[name];
     if (!spriteData) return;
-
-    const canvas = this._renderToCanvas(spriteData, scale, flipX);
+    const canvas = this._renderTileToCanvas(spriteData, scale, flipX);
     ctx.drawImage(canvas, Math.floor(x), Math.floor(y));
   }
 
-  // Get sprite dimensions
   getSize(name, scale = 1) {
-    const spriteData = Array.isArray(this.sprites[name])
-      ? (Array.isArray(this.sprites[name][0]?.[0]) ? this.sprites[name][0] : this.sprites[name])
-      : this.sprites[name];
-    if (!spriteData) return { w: 0, h: 0 };
+    if (this.proceduralSprites[name]) {
+      const s = name === 'kingFox' ? 16 * scale : 16;
+      return { w: s, h: s };
+    }
+    const spriteData = this.tileSprites[name];
+    if (!spriteData) return { w: 16, h: 16 };
     return { w: spriteData[0].length * scale, h: spriteData.length * scale };
   }
 }
