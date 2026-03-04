@@ -27,6 +27,16 @@ export class Camera {
       this.targetX += target.facingRight ? 20 : -20;
     }
 
+    // Y-axis deadzone for smooth vertical scrolling in tall levels
+    const levelPixelHeight = levelHeight * TILE_SIZE;
+    if (levelPixelHeight > this.viewHeight) {
+      const yDeadzone = 40;
+      const yCenterDiff = target.y + target.h / 2 - (this.y + this.viewHeight / 2);
+      if (Math.abs(yCenterDiff) < yDeadzone) {
+        this.targetY = this.y; // Hold current Y position
+      }
+    }
+
     // Smooth interpolation
     this.x += (this.targetX - this.x) * this.smoothing;
     this.y += (this.targetY - this.y) * this.smoothing;

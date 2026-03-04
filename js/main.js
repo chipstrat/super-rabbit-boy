@@ -6,6 +6,7 @@ import { Input } from './input.js';
 const canvas = document.getElementById('game-canvas');
 const game = new Game(canvas);
 const input = new Input();
+window._game = game; // debug reference
 
 // Fixed timestep game loop
 const TARGET_FPS = 60;

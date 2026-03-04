@@ -116,4 +116,40 @@ export class Audio {
     this._playTone(400, 0.05, 'square', 0.08);
     setTimeout(() => this._playTone(300, 0.05, 'square', 0.08), 50);
   }
+
+  swim() {
+    this._playTone(250, 0.06, 'sine', 0.06);
+    setTimeout(() => this._playTone(300, 0.06, 'sine', 0.05), 40);
+  }
+
+  quicksandSink() {
+    this._playTone(100, 0.2, 'sawtooth', 0.06);
+    this._playTone(80, 0.3, 'sine', 0.04);
+  }
+
+  secretFound() {
+    const notes = [392, 440, 523, 659, 784];
+    notes.forEach((n, i) => {
+      setTimeout(() => this._playTone(n, 0.12, 'triangle', 0.12), i * 80);
+    });
+  }
+
+  snakeHiss() {
+    this._playTone(120, 0.15, 'sawtooth', 0.1);
+    setTimeout(() => this._playTone(80, 0.2, 'sawtooth', 0.08), 100);
+    setTimeout(() => this._playTone(60, 0.25, 'sawtooth', 0.06), 200);
+  }
+
+  vikingRoar() {
+    this._playTone(80, 0.3, 'sawtooth', 0.15);
+    setTimeout(() => this._playTone(100, 0.2, 'square', 0.12), 100);
+    setTimeout(() => this._playTone(60, 0.4, 'sawtooth', 0.1), 200);
+  }
+
+  gameWin() {
+    const melody = [523, 659, 784, 1047, 784, 1047, 1319, 1047, 1319, 1568];
+    melody.forEach((n, i) => {
+      setTimeout(() => this._playTone(n, 0.2, 'triangle', 0.15), i * 200);
+    });
+  }
 }

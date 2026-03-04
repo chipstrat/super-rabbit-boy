@@ -4,6 +4,17 @@ export const GRAVITY = 0.4;
 export const TERMINAL_VELOCITY = 8;
 export const TILE_SIZE = 16;
 
+// Water physics
+export const WATER_GRAVITY = 0.1;
+export const WATER_TERMINAL_VELOCITY = 2;
+export const WATER_DRAG = 0.85;
+export const WATER_SWIM_FORCE = -2.5;
+
+// Quicksand physics
+export const QUICKSAND_SINK_SPEED = 0.3;
+export const QUICKSAND_DRAG = 0.5;
+export const QUICKSAND_ESCAPE_FORCE = -3;
+
 // AABB collision check
 export function aabbOverlap(a, b) {
   return a.x < b.x + b.w && a.x + a.w > b.x &&
@@ -13,10 +24,11 @@ export function aabbOverlap(a, b) {
 // Check if a world position corresponds to a solid tile
 export function isSolid(level, col, row) {
   if (col < 0 || row < 0 || col >= level.width || row >= level.height) {
-    return row >= level.height; // Bottom is solid (death pit returns false, handled elsewhere)
+    return row >= level.height;
   }
   const tile = level.getTile(col, row);
-  return tile > 0 && tile !== 5; // 5 = one-way platform (handled separately)
+  // Water (6), quicksand (7) are NOT solid
+  return tile > 0 && tile !== 5 && tile !== 6 && tile !== 7;
 }
 
 // Check if tile is a one-way platform
@@ -31,10 +43,35 @@ export function isBreakable(level, col, row) {
   return level.getTile(col, row) === 4; // brick
 }
 
+// Check if tile is water
+export function isWater(level, col, row) {
+  if (col < 0 || row < 0 || col >= level.width || row >= level.height) return false;
+  return level.getTile(col, row) === 6;
+}
+
+// Check if tile is quicksand
+export function isQuicksand(level, col, row) {
+  if (col < 0 || row < 0 || col >= level.width || row >= level.height) return false;
+  return level.getTile(col, row) === 7;
+}
+
 // Resolve entity movement against tilemap with collision
 export function moveEntity(entity, level, dt = 1) {
-  // Apply gravity
-  entity.vy = Math.min(entity.vy + GRAVITY * dt, TERMINAL_VELOCITY);
+  // Determine environment at entity center
+  const centerCol = Math.floor((entity.x + (entity.w || 12) / 2) / TILE_SIZE);
+  const centerRow = Math.floor((entity.y + (entity.h || 14) / 2) / TILE_SIZE);
+  const inWater = isWater(level, centerCol, centerRow);
+  const inQuicksand = isQuicksand(level, centerCol, centerRow);
+
+  if (inWater) {
+    entity.vy = Math.min(entity.vy + WATER_GRAVITY * dt, WATER_TERMINAL_VELOCITY);
+    entity.vx *= WATER_DRAG;
+  } else if (inQuicksand) {
+    entity.vy = Math.min(entity.vy + GRAVITY * 0.3 * dt, QUICKSAND_SINK_SPEED);
+    entity.vx *= QUICKSAND_DRAG;
+  } else {
+    entity.vy = Math.min(entity.vy + GRAVITY * dt, TERMINAL_VELOCITY);
+  }
 
   // Move X
   entity.x += entity.vx * dt;
@@ -88,14 +125,12 @@ function resolveY(entity, level) {
           entity.y = row * TILE_SIZE - entity.h;
           entity.vy = 0;
           entity.onGround = true;
-          // Break bricks by stomping
           if (isBreakable(level, col, row) && entity.isDashing) {
             level.breakTile(col, row);
           }
         } else if (entity.vy < 0) {
           entity.y = (row + 1) * TILE_SIZE;
           entity.vy = 0;
-          // Break bricks from below
           if (isBreakable(level, col, row)) {
             level.breakTile(col, row);
           }

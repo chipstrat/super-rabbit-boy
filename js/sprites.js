@@ -125,6 +125,95 @@ const SPRITE_CHECKPOINT = [
   [C,C,C,C,C,C,C,C,C,C,C,C,C,C,C,C],
 ];
 
+
+// ── New tile pixel arrays for expanded levels ──
+
+const WATER = '#3388cc';
+const WATER_LIGHT = '#55aaee';
+const WATER_DARK = '#2266aa';
+const SAND_COLOR = '#e8d088';
+const SAND_DARK = '#c8b068';
+const SAND_LIGHT = '#f8e0a8';
+const QS_COLOR = '#b89858';
+const QS_DARK = '#987838';
+const CASTLE_W = '#555566';
+const CASTLE_D = '#444455';
+const CASTLE_L = '#666677';
+const ICE_COLOR = '#ccddff';
+const ICE_LIGHT = '#eef4ff';
+const ICE_DARK = '#aabbdd';
+
+const TILE_WATER = (() => {
+  const t = Array.from({ length: 16 }, () => Array(16).fill(WATER));
+  for (let y = 0; y < 16; y++)
+    for (let x = 0; x < 16; x++) {
+      if ((x + y) % 5 === 0) t[y][x] = WATER_LIGHT;
+      if ((x * 3 + y * 7) % 11 === 0) t[y][x] = WATER_DARK;
+    }
+  // Surface ripple on top row
+  for (let x = 0; x < 16; x++) { t[0][x] = WATER_LIGHT; t[1][x] = WATER_LIGHT; }
+  return t;
+})();
+
+const TILE_QUICKSAND = (() => {
+  const t = Array.from({ length: 16 }, () => Array(16).fill(QS_COLOR));
+  for (let y = 0; y < 16; y++)
+    for (let x = 0; x < 16; x++) {
+      if ((x + y * 3) % 7 === 0) t[y][x] = QS_DARK;
+      if ((x * 5 + y) % 9 === 0) t[y][x] = SAND_COLOR;
+    }
+  return t;
+})();
+
+const TILE_SAND = (() => {
+  const t = Array.from({ length: 16 }, () => Array(16).fill(SAND_COLOR));
+  for (let y = 0; y < 16; y++)
+    for (let x = 0; x < 16; x++) {
+      if ((x + y) % 7 === 0) t[y][x] = SAND_DARK;
+      if ((x * 3 + y * 2) % 11 === 0) t[y][x] = SAND_LIGHT;
+    }
+  // Top edge slightly lighter
+  for (let x = 0; x < 16; x++) { t[0][x] = SAND_LIGHT; t[1][x] = SAND_LIGHT; }
+  return t;
+})();
+
+const TILE_CASTLE_WALL = (() => {
+  const t = Array.from({ length: 16 }, () => Array(16).fill(CASTLE_W));
+  for (let y = 0; y < 16; y++)
+    for (let x = 0; x < 16; x++) {
+      if ((x * 3 + y * 5) % 11 === 0) t[y][x] = CASTLE_L;
+      if ((x * 7 + y * 2) % 13 === 0) t[y][x] = CASTLE_D;
+    }
+  // Mortar lines
+  for (let x = 0; x < 16; x++) { t[7][x] = CASTLE_D; t[15][x] = CASTLE_D; }
+  for (let y = 0; y < 8; y++) t[y][7] = CASTLE_D;
+  for (let y = 8; y < 16; y++) { t[y][0] = CASTLE_D; t[y][15] = CASTLE_D; }
+  return t;
+})();
+
+const TILE_CASTLE_FLOOR = (() => {
+  const t = Array.from({ length: 16 }, () => Array(16).fill(CASTLE_L));
+  for (let y = 0; y < 16; y++)
+    for (let x = 0; x < 16; x++) {
+      if ((x + y) % 4 === 0) t[y][x] = CASTLE_W;
+    }
+  for (let x = 0; x < 16; x++) { t[0][x] = '#777788'; }
+  return t;
+})();
+
+const TILE_ICE = (() => {
+  const t = Array.from({ length: 16 }, () => Array(16).fill(ICE_COLOR));
+  for (let y = 0; y < 16; y++)
+    for (let x = 0; x < 16; x++) {
+      if ((x + y) % 5 === 0) t[y][x] = ICE_LIGHT;
+      if ((x * 3 + y * 7) % 13 === 0) t[y][x] = ICE_DARK;
+    }
+  // Shine spots
+  t[2][3] = ICE_LIGHT; t[2][4] = ICE_LIGHT;
+  t[6][10] = ICE_LIGHT; t[6][11] = ICE_LIGHT;
+  return t;
+})();
+
 // ── Procedural draw functions for characters ──
 // These draw smooth, outlined cartoon-style characters using Canvas 2D
 
@@ -474,6 +563,79 @@ function drawKingViking(ctx, flipX, scale) {
   ctx.restore();
 }
 
+
+// ── Fish enemy ──
+function drawFish(ctx, frame, flipX) {
+  ctx.save();
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16, 0); }
+  ctx.lineWidth = 1; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
+  // Body
+  ctx.fillStyle = '#ff6644';
+  ctx.beginPath(); ctx.ellipse(8, 7, 5, 3.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  // Belly
+  ctx.fillStyle = '#ffaa66';
+  ctx.beginPath(); ctx.ellipse(8, 8.5, 3.5, 1.5, 0, 0, Math.PI); ctx.fill();
+  // Tail fin
+  const tailW = frame === 0 ? 3 : 2;
+  ctx.fillStyle = '#cc4422';
+  ctx.beginPath(); ctx.moveTo(13, 7); ctx.lineTo(13 + tailW, 4); ctx.lineTo(13 + tailW, 10); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  // Eye
+  ctx.fillStyle = '#222034';
+  ctx.beginPath(); ctx.arc(5, 6, 1, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = WHITE;
+  ctx.beginPath(); ctx.arc(5.3, 5.7, 0.3, 0, Math.PI * 2); ctx.fill();
+  // Top fin
+  ctx.fillStyle = '#cc4422';
+  ctx.beginPath(); ctx.moveTo(7, 3.5); ctx.lineTo(9, 1.5); ctx.lineTo(10, 3.5); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+
+// ── RoboSnake head ──
+function drawSnakeHead(ctx, flipX) {
+  ctx.save();
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16, 0); }
+  ctx.lineWidth = 1.2; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
+  // Head
+  ctx.fillStyle = '#44aa44';
+  ctx.beginPath(); ctx.roundRect(2, 3, 12, 10, 3); ctx.fill(); ctx.stroke();
+  // Eyes
+  ctx.fillStyle = '#ff3333';
+  ctx.beginPath(); ctx.arc(5, 7, 1.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(11, 7, 1.5, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#ff8888';
+  ctx.beginPath(); ctx.arc(5.3, 6.7, 0.4, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(11.3, 6.7, 0.4, 0, Math.PI * 2); ctx.fill();
+  // Fangs
+  ctx.fillStyle = WHITE;
+  ctx.beginPath(); ctx.moveTo(4, 12); ctx.lineTo(5, 14); ctx.lineTo(6, 12); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(10, 12); ctx.lineTo(11, 14); ctx.lineTo(12, 12); ctx.fill();
+  // Antenna
+  ctx.strokeStyle = '#338833'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(8, 3); ctx.lineTo(8, 0); ctx.stroke();
+  ctx.fillStyle = '#ff3333';
+  ctx.beginPath(); ctx.arc(8, 0, 1, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+// ── RoboSnake body segment ──
+function drawSnakeSegment(ctx, flipX) {
+  ctx.save();
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16, 0); }
+  ctx.lineWidth = 1; ctx.strokeStyle = BLACK;
+  ctx.fillStyle = '#338833';
+  ctx.beginPath(); ctx.ellipse(8, 8, 5, 5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  // Belly
+  ctx.fillStyle = '#88cc88';
+  ctx.beginPath(); ctx.ellipse(8, 9, 3, 2, 0, 0, Math.PI); ctx.fill();
+  // Rivets
+  ctx.fillStyle = '#aabbaa';
+  ctx.beginPath(); ctx.arc(5, 6, 0.6, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(11, 6, 0.6, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
 // ── Item draw functions ──
 function drawCarrot(ctx) {
   ctx.lineWidth = 1; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
@@ -555,6 +717,12 @@ export class SpriteRenderer {
       tileStone: TILE_STONE,
       tileBrick: TILE_BRICK,
       tilePlatform: TILE_PLATFORM,
+      tileWater: TILE_WATER,
+      tileQuicksand: TILE_QUICKSAND,
+      tileSand: TILE_SAND,
+      tileCastleWall: TILE_CASTLE_WALL,
+      tileCastleFloor: TILE_CASTLE_FLOOR,
+      tileIce: TILE_ICE,
       checkpoint: SPRITE_CHECKPOINT,
     };
 
@@ -570,6 +738,9 @@ export class SpriteRenderer {
       heart: { frames: 1, draw: (ctx) => drawHeart(ctx) },
       star: { frames: 1, draw: (ctx) => drawStar(ctx) },
       speed: { frames: 1, draw: (ctx) => drawSpeed(ctx) },
+      fish: { frames: 2, draw: (ctx, frame, flipX) => drawFish(ctx, frame, flipX) },
+      snakeHead: { frames: 1, draw: (ctx, frame, flipX) => drawSnakeHead(ctx, flipX) },
+      snakeSegment: { frames: 1, draw: (ctx, frame, flipX) => drawSnakeSegment(ctx, flipX) },
     };
 
     // Backwards-compat: unified sprites map for getSize
