@@ -139,7 +139,8 @@ function resolveY(entity, level) {
       }
 
       // One-way platform: only solid when falling and feet are at/above the platform top
-      if (isPlatform(level, col, row) && entity.vy > 0) {
+      // Drop through when pressing down or dashing
+      if (isPlatform(level, col, row) && entity.vy > 0 && !entity.dropThrough) {
         const platTop = row * TILE_SIZE;
         const entityBottom = entity.y + entity.h;
         const prevBottom = entityBottom - entity.vy;

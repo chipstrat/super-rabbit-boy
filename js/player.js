@@ -134,6 +134,13 @@ export class Player {
     const speed = this.hasSpeedBoost ? DASH_SPEED : (input.dash ? DASH_SPEED : MOVE_SPEED);
     this.isDashing = input.dash && this.dashCooldown <= 0;
 
+    // Drop through one-way platforms when pressing down while on ground
+    this.dropThrough = input.down && this.onGround;
+    if (this.dropThrough) {
+      this.y += 2; // nudge past platform edge
+      this.onGround = false;
+    }
+
     if (input.left) { this.vx = -speed; this.facingRight = false; }
     else if (input.right) { this.vx = speed; this.facingRight = true; }
     else { this.vx *= friction; if (Math.abs(this.vx) < 0.1) this.vx = 0; }
