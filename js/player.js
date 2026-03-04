@@ -57,6 +57,8 @@ export class Player {
     this.inQuicksand = false;
     this.onIce = false;
     this.swimTimer = 0;
+    this.dropThrough = false;
+    this.dropThroughTimer = 0;
 
     this.animTimer = 0;
     this.animFrame = 0;
@@ -135,10 +137,16 @@ export class Player {
     this.isDashing = input.dash && this.dashCooldown <= 0;
 
     // Drop through one-way platforms when pressing down while on ground
-    this.dropThrough = input.down && this.onGround;
-    if (this.dropThrough) {
-      this.y += 2; // nudge past platform edge
+    if (input.down && this.onGround) {
+      this.dropThrough = true;
+      this.dropThroughTimer = 12; // enough frames to clear the platform
+      this.y += 4; // nudge past platform edge
       this.onGround = false;
+    } else if (this.dropThroughTimer > 0) {
+      this.dropThroughTimer--;
+      if (this.dropThroughTimer <= 0) this.dropThrough = false;
+    } else {
+      this.dropThrough = false;
     }
 
     if (input.left) { this.vx = -speed; this.facingRight = false; }

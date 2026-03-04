@@ -273,9 +273,8 @@ function generateLevel2() {
       side = 'left';
     }
 
-    // Use different tile types
-    const tiletype = currentRow > 40 ? G : (currentRow > 20 ? W : S);
-    fillRect(grid, startCol, currentRow, platLen, 1, tiletype);
+    // All climbing platforms are one-way so player can drop through them
+    fillRect(grid, startCol, currentRow, platLen, 1, P);
     platforms.push({ col: startCol, row: currentRow, len: platLen });
 
     // Consistent 3-tile gap (reachable jump height)
