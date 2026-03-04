@@ -212,6 +212,125 @@ export class RoboFish {
   }
 }
 
+// Robo-Bro — large robot miniboss, 4HP, charges + ground pound, patrols area
+export class RoboBro {
+  constructor(x, y, patrolLeft, patrolRight) {
+    this.x = x; this.y = y;
+    this.w = 14; this.h = 20; this.vx = 0.6; this.vy = 0;
+    this.patrolLeft = patrolLeft || x - 80; this.patrolRight = patrolRight || x + 80;
+    this.facingRight = true; this.alive = true; this.deathTimer = 0;
+    this.onGround = false; this.wallLeft = false; this.wallRight = false; this.isDashing = false;
+    this.animTimer = 0; this.animFrame = 0;
+    this.spriteOffsetX = -1; this.spriteOffsetY = -4;
+    this.hp = 4;
+    this.maxHp = 4;
+    this.state = 'patrol'; // patrol, charge, jump, stunned
+    this.stateTimer = 0;
+    this.stunTimer = 0;
+    this.chargeSpeed = 3.0;
+    this.gravity = 0.3;
+  }
+
+  update(level) {
+    if (!this.alive) {
+      this.deathTimer--; this.vy += 0.2; this.y += this.vy;
+      return this.deathTimer > 0;
+    }
+    if (this.stunTimer > 0) {
+      this.stunTimer--;
+      if (this.stunTimer <= 0) { this.state = 'patrol'; this.stateTimer = 0; }
+      return true;
+    }
+
+    this.stateTimer++;
+
+    // Gravity
+    this.vy += this.gravity;
+    this.y += this.vy;
+
+    // Simple ground collision (stand on solid tiles)
+    const feetRow = Math.floor((this.y + this.h) / 16);
+    const leftCol = Math.floor(this.x / 16);
+    const rightCol = Math.floor((this.x + this.w) / 16);
+    if (feetRow < level.height && feetRow >= 0) {
+      for (let c = leftCol; c <= rightCol; c++) {
+        const t = level.getTile(c, feetRow);
+        if (t > 0 && t !== 5 && t !== 6 && t !== 7) {
+          this.y = feetRow * 16 - this.h;
+          this.vy = 0;
+          this.onGround = true;
+          break;
+        }
+      }
+    }
+
+    switch (this.state) {
+      case 'patrol':
+        this.x += this.facingRight ? this.vx : -this.vx;
+        if (this.x <= this.patrolLeft) { this.facingRight = true; }
+        if (this.x + this.w >= this.patrolRight) { this.facingRight = false; }
+        // Transition to charge every 3 seconds
+        if (this.stateTimer > 180) {
+          this.state = 'charge';
+          this.stateTimer = 0;
+        }
+        break;
+
+      case 'charge':
+        this.x += this.facingRight ? this.chargeSpeed : -this.chargeSpeed;
+        if (this.x <= this.patrolLeft) { this.facingRight = true; }
+        if (this.x + this.w >= this.patrolRight) { this.facingRight = false; }
+        // After 1.5 seconds, jump
+        if (this.stateTimer > 90) {
+          this.state = 'jump';
+          this.stateTimer = 0;
+          this.vy = -7;
+        }
+        break;
+
+      case 'jump':
+        this.x += this.facingRight ? 1.5 : -1.5;
+        if (this.onGround && this.stateTimer > 10) {
+          this.state = 'patrol';
+          this.stateTimer = 0;
+        }
+        break;
+    }
+
+    // Animation
+    this.animTimer++;
+    if (this.animTimer >= 10) { this.animTimer = 0; this.animFrame = (this.animFrame + 1) % 2; }
+    return true;
+  }
+
+  getHitbox() { return { x: this.x, y: this.y, w: this.w, h: this.h }; }
+
+  stomp() {
+    this.hp--;
+    this.stunTimer = 45;
+    this.state = 'stunned';
+    this.stateTimer = 0;
+    this.vx = 0;
+    if (this.hp <= 0) {
+      this.alive = false; this.deathTimer = 30; this.vy = -2;
+    }
+  }
+
+  draw(ctx, spriteRenderer, camera) {
+    if (!camera.isVisible(this.x - 1, this.y - 4, 16, 24)) return;
+    if (!this.alive) ctx.globalAlpha = this.deathTimer / 30;
+    if (this.stunTimer > 0 && Math.floor(this.stunTimer / 3) % 2) ctx.globalAlpha = 0.4;
+    spriteRenderer.draw(ctx, 'robobro', Math.floor(this.x + this.spriteOffsetX), Math.floor(this.y + this.spriteOffsetY), this.animFrame, this.facingRight);
+    // HP bar
+    if (this.alive && this.hp < this.maxHp) {
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#333'; ctx.fillRect(this.x - 2, this.y - 8, 18, 3);
+      ctx.fillStyle = '#ef4444'; ctx.fillRect(this.x - 1, this.y - 7, 16 * (this.hp / this.maxHp), 1);
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
 // King Fox Boss (Level 1)
 export class KingFox {
   constructor(x, y) {
@@ -632,6 +751,7 @@ export function createEnemies(enemyData) {
       case 'bird': return new Bird(e.x, e.y, e.patrolLeft, e.patrolRight);
       case 'fish': return new Fish(e.x, e.y, e.patrolLeft, e.patrolRight);
       case 'robofish': return new RoboFish(e.x, e.y, e.patrolLeft, e.patrolRight);
+      case 'robobro': return new RoboBro(e.x, e.y, e.patrolLeft, e.patrolRight);
       default: return null;
     }
   }).filter(Boolean);

@@ -846,6 +846,9 @@ function generateLevel5() {
   // Entry hall
   enemies.push({ type: 'fox', x: 43 * 16, y: 21 * 16 });
   enemies.push({ type: 'bird', x: 50 * 16, y: 12 * 16 });
+  // Robo-Bro minibosses guarding maze entrance (4HP each, charge + jump)
+  enemies.push({ type: 'robobro', x: 58 * 16, y: 25 * 16, patrolLeft: 55 * 16, patrolRight: 68 * 16 });
+  enemies.push({ type: 'robobro', x: 64 * 16, y: 25 * 16, patrolLeft: 58 * 16, patrolRight: 72 * 16 });
   // Maze enemies (scattered in dead ends)
   enemies.push({ type: 'fox', x: 65 * 16, y: 6 * 16 });
   enemies.push({ type: 'fox', x: 80 * 16, y: 14 * 16 });

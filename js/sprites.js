@@ -632,6 +632,55 @@ function drawRoboFish(ctx, frame, flipX) {
   ctx.restore();
 }
 
+// ── Robo-Bro (tall bulky robot miniboss) ──
+function drawRoboBro(ctx, frame, flipX) {
+  ctx.save();
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16, 0); }
+  ctx.lineWidth = 1.2; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
+  // Body (large torso)
+  ctx.fillStyle = '#556688';
+  ctx.beginPath(); ctx.roundRect(2, 8, 12, 10, 2); ctx.fill(); ctx.stroke();
+  // Chest plate
+  ctx.fillStyle = '#667799';
+  ctx.fillRect(4, 9, 8, 4);
+  ctx.strokeRect(4, 9, 8, 4);
+  // Chest light
+  ctx.fillStyle = frame === 0 ? '#ff3333' : '#ff6666';
+  ctx.beginPath(); ctx.arc(8, 11, 1.5, 0, Math.PI * 2); ctx.fill();
+  // Head
+  ctx.fillStyle = '#445577';
+  ctx.beginPath(); ctx.roundRect(3, 1, 10, 8, 2); ctx.fill(); ctx.stroke();
+  // Visor
+  ctx.fillStyle = '#ff2222';
+  ctx.fillRect(5, 3, 6, 3);
+  ctx.strokeRect(5, 3, 6, 3);
+  // Visor glow
+  ctx.fillStyle = '#ff8888';
+  ctx.fillRect(6, 4, 2, 1);
+  ctx.fillRect(9, 4, 2, 1);
+  // Antenna
+  ctx.strokeStyle = '#aabbcc'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(8, 1); ctx.lineTo(8, -2); ctx.stroke();
+  ctx.fillStyle = '#ffcc00';
+  ctx.beginPath(); ctx.arc(8, -2, 1, 0, Math.PI * 2); ctx.fill();
+  // Arms
+  ctx.fillStyle = '#445577'; ctx.strokeStyle = BLACK; ctx.lineWidth = 1.2;
+  ctx.fillRect(0, 9, 3, 7); ctx.strokeRect(0, 9, 3, 7);
+  ctx.fillRect(13, 9, 3, 7); ctx.strokeRect(13, 9, 3, 7);
+  // Fists
+  ctx.fillStyle = '#667799';
+  ctx.fillRect(0, 14, 3, 3); ctx.fillRect(13, 14, 3, 3);
+  // Legs
+  ctx.fillStyle = '#334466';
+  const legOff = frame === 0 ? 0 : 1;
+  ctx.fillRect(3, 18, 4, 4 + legOff); ctx.strokeRect(3, 18, 4, 4 + legOff);
+  ctx.fillRect(9, 18, 4, 4 - legOff); ctx.strokeRect(9, 18, 4, 4 - legOff);
+  // Feet
+  ctx.fillStyle = '#556688';
+  ctx.fillRect(2, 21 + legOff, 6, 2); ctx.fillRect(8, 21 - legOff, 6, 2);
+  ctx.restore();
+}
+
 // ── RoboSnake head ──
 function drawSnakeHead(ctx, flipX) {
   ctx.save();
@@ -780,6 +829,7 @@ export class SpriteRenderer {
       speed: { frames: 1, draw: (ctx) => drawSpeed(ctx) },
       fish: { frames: 2, draw: (ctx, frame, flipX) => drawFish(ctx, frame, flipX) },
       robofish: { frames: 2, draw: (ctx, frame, flipX) => drawRoboFish(ctx, frame, flipX) },
+      robobro: { frames: 2, draw: (ctx, frame, flipX) => drawRoboBro(ctx, frame, flipX) },
       snakeHead: { frames: 1, draw: (ctx, frame, flipX) => drawSnakeHead(ctx, flipX) },
       snakeSegment: { frames: 1, draw: (ctx, frame, flipX) => drawSnakeSegment(ctx, flipX) },
     };
