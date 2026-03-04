@@ -465,17 +465,17 @@ function generateLevel3() {
 
   // Enemies
   const enemies = [];
-  // Regular fish in water (early section)
+  // Regular fish in water (early section) — patrol 5 tiles each direction
   const fishCols = [18, 24, 33, 40, 48, 55];
   fishCols.forEach(c => {
     const r = 4 + Math.floor(Math.random() * 5);
-    enemies.push({ type: 'fish', x: c * 16, y: r * 16 });
+    enemies.push({ type: 'fish', x: c * 16, y: r * 16, patrolLeft: (c - 5) * 16, patrolRight: (c + 5) * 16 });
   });
-  // Dangerous robofish in deeper/later water sections — armored, homing, 2 stomps to kill
+  // Dangerous robofish in deeper/later water sections — patrol 6 tiles each direction
   const robofishCols = [60, 68, 75, 82, 88, 93, 97];
   robofishCols.forEach(c => {
     const r = 3 + Math.floor(Math.random() * 6);
-    enemies.push({ type: 'robofish', x: c * 16, y: r * 16 });
+    enemies.push({ type: 'robofish', x: c * 16, y: r * 16, patrolLeft: (c - 6) * 16, patrolRight: (c + 6) * 16 });
   });
   // Birds on dry land
   enemies.push({ type: 'bird', x: 5 * 16, y: 4 * 16 });
@@ -701,50 +701,24 @@ function generateLevel5() {
 
   // ---- Section A: Castle Approach (cols 0-60) ----
 
-  // Ground
-  fillRect(grid, 0, H_L - 2, 60, 2, G);
+  // Ground across approach + bottom of maze
+  fillRect(grid, 0, H_L - 2, W_L, 2, G);
 
-  // Sky area is open
+  // Moat (cols 18-25)
+  fillRect(grid, 18, H_L - 2, 8, 2, WA);
+  for (let c = 19; c <= 24; c++) setTile(grid, c, H_L - 3, P); // bridge
 
-  // Moat (cols 20-28)
-  fillRect(grid, 20, H_L - 2, 9, 2, WA);
+  // Castle gate towers (decorative, not blocking)
+  fillRect(grid, 28, 15, 2, 13, CW); // left tower
+  fillRect(grid, 28, 15, 6, 2, CW);  // top
+  fillRect(grid, 32, 15, 2, 13, CW); // right tower
+  // Gate opening between towers (cols 30-31, rows 17-27) is clear
 
-  // Drawbridge (platforms over moat)
-  for (let c = 21; c <= 27; c++) {
-    setTile(grid, c, H_L - 3, P);
-  }
-
-  // Castle entrance (cols 30-40)
-  fillRect(grid, 30, 10, 2, 18, CW); // left tower
-  fillRect(grid, 38, 10, 2, 18, CW); // right tower
-  fillRect(grid, 30, 10, 10, 2, CW); // top
-  // Entry hall
-  fillRect(grid, 32, 12, 6, 1, CF);
-  fillRect(grid, 32, 18, 6, 1, CF);
-  fillRect(grid, 32, 24, 6, 1, CF);
-
-  // Approach platforms
-  fillRect(grid, 5, H_L - 5, 4, 1, G);
-  fillRect(grid, 12, H_L - 7, 3, 1, G);
-  fillRect(grid, 42, H_L - 4, 4, 1, CF);
-  fillRect(grid, 48, H_L - 6, 3, 1, CF);
-  fillRect(grid, 53, H_L - 5, 4, 1, CF);
-
-  // Entry hall interior (cols 40-60)
-  fillRect(grid, 40, 8, 20, 1, CW); // ceiling
-  fillRect(grid, 40, 8, 1, 20, CW); // left wall
-  fillRect(grid, 59, 8, 1, 20, CW); // right wall
-
-  // Interior platforms
-  fillRect(grid, 42, 22, 4, 1, CF);
-  fillRect(grid, 50, 19, 4, 1, CF);
-  fillRect(grid, 44, 16, 4, 1, CF);
-  fillRect(grid, 52, 13, 4, 1, CF);
-  fillRect(grid, 46, 10, 5, 1, CF);
-
-  // "YOU'RE AWESOME!" room (col 55, hidden behind breakable wall)
-  setTile(grid, 59, 24, B);
-  setTile(grid, 59, 25, B);
+  // Platforms leading up before maze
+  fillRect(grid, 38, H_L - 5, 4, 1, G);
+  fillRect(grid, 44, H_L - 7, 4, 1, G);
+  fillRect(grid, 50, H_L - 5, 4, 1, G);
+  fillRect(grid, 56, H_L - 7, 3, 1, G);
 
   // ---- Section B: Giant Maze (cols 60-150) ----
   // Platformer-friendly maze: horizontal corridors connected by vertical shafts
@@ -820,8 +794,11 @@ function generateLevel5() {
   // Alcove 3 (lower right)
   fillRect(grid, mazeRight - 8, 18, 6, 3, E);
 
-  // Maze entrance (left side, row 26 corridor)
-  fillRect(grid, mazeLeft, 23, 1, 3, E);
+  // Maze entrance (left side) — clear from ground level up into bottom corridor
+  for (let r = mazeTop; r < H_L - 2; r++) {
+    setTile(grid, mazeLeft, r, E);
+    setTile(grid, mazeLeft + 1, r, E);
+  }
 
   // Maze exit (right side, connecting to boss arena at row 14-17)
   fillRect(grid, mazeRight - 1, 13, 1, 4, E);
