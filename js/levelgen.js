@@ -465,11 +465,17 @@ function generateLevel3() {
 
   // Enemies
   const enemies = [];
-  // Fish in water
-  const fishCols = [18, 24, 33, 40, 48, 55, 62, 70, 75, 80, 88, 92, 95, 98];
+  // Regular fish in water (early section)
+  const fishCols = [18, 24, 33, 40, 48, 55];
   fishCols.forEach(c => {
     const r = 4 + Math.floor(Math.random() * 5);
     enemies.push({ type: 'fish', x: c * 16, y: r * 16 });
+  });
+  // Dangerous robofish in deeper/later water sections — armored, homing, 2 stomps to kill
+  const robofishCols = [60, 68, 75, 82, 88, 93, 97];
+  robofishCols.forEach(c => {
+    const r = 3 + Math.floor(Math.random() * 6);
+    enemies.push({ type: 'robofish', x: c * 16, y: r * 16 });
   });
   // Birds on dry land
   enemies.push({ type: 'bird', x: 5 * 16, y: 4 * 16 });
@@ -741,90 +747,89 @@ function generateLevel5() {
   setTile(grid, 59, 25, B);
 
   // ---- Section B: Giant Maze (cols 60-150) ----
-  // Generate maze using recursive backtracking
-  // Maze uses 3-tile-wide corridors within the space
+  // Platformer-friendly maze: horizontal corridors connected by vertical shafts
+  // Corridors are EMPTY (0) so the player can walk, walls are CW (9)
   const mazeLeft = 60, mazeRight = 150;
   const mazeTop = 2, mazeBottom = 27;
-  const mazeW = mazeRight - mazeLeft;
-  const mazeH = mazeBottom - mazeTop;
 
-  // Fill maze area with castle wall
-  fillRect(grid, mazeLeft, mazeTop, mazeW, mazeH, CW);
+  // Fill entire maze area with castle wall (solid)
+  fillRect(grid, mazeLeft, mazeTop, mazeRight - mazeLeft, mazeBottom - mazeTop, CW);
 
-  // Create maze corridors using simple recursive division
-  // Grid cells: each cell is 3x3 (2 corridor + 1 wall)
-  const cellSize = 3;
-  const cellsX = Math.floor(mazeW / cellSize);
-  const cellsY = Math.floor(mazeH / cellSize);
-  const visited = createGrid(cellsX, cellsY, false);
-  const walls = { right: createGrid(cellsX, cellsY, true), down: createGrid(cellsX, cellsY, true) };
+  // Define horizontal corridor levels (y = floor row, 3 tiles high each)
+  // Player walks on the floor tile, 2 empty tiles above for headroom
+  const corridors = [
+    { y: 6, left: mazeLeft, right: mazeLeft + 30 },      // top-left
+    { y: 6, left: mazeLeft + 40, right: mazeRight },      // top-right
+    { y: 11, left: mazeLeft, right: mazeLeft + 45 },      // mid-upper-left
+    { y: 11, left: mazeLeft + 55, right: mazeRight },     // mid-upper-right
+    { y: 16, left: mazeLeft, right: mazeLeft + 35 },      // middle-left
+    { y: 16, left: mazeLeft + 50, right: mazeRight },     // middle-right
+    { y: 21, left: mazeLeft, right: mazeLeft + 50 },      // mid-lower-left
+    { y: 21, left: mazeLeft + 60, right: mazeRight },     // mid-lower-right
+    { y: 26, left: mazeLeft, right: mazeRight },           // bottom full-width
+  ];
 
-  // DFS maze generation
-  const stack = [];
-  let cx = 0, cy = 0;
-  visited[cy][cx] = true;
-  stack.push([cx, cy]);
-
-  while (stack.length > 0) {
-    const neighbors = [];
-    if (cx > 0 && !visited[cy][cx - 1]) neighbors.push([cx - 1, cy, 'left']);
-    if (cx < cellsX - 1 && !visited[cy][cx + 1]) neighbors.push([cx + 1, cy, 'right']);
-    if (cy > 0 && !visited[cy - 1][cx]) neighbors.push([cx, cy - 1, 'up']);
-    if (cy < cellsY - 1 && !visited[cy + 1][cx]) neighbors.push([cx, cy + 1, 'down']);
-
-    if (neighbors.length > 0) {
-      const [nx, ny, dir] = neighbors[Math.floor(Math.random() * neighbors.length)];
-      if (dir === 'right') walls.right[cy][cx] = false;
-      if (dir === 'left') walls.right[ny][nx] = false;
-      if (dir === 'down') walls.down[cy][cx] = false;
-      if (dir === 'up') walls.down[ny][nx] = false;
-
-      visited[ny][nx] = true;
-      stack.push([cx, cy]);
-      cx = nx;
-      cy = ny;
-    } else {
-      [cx, cy] = stack.pop();
+  // Carve corridors: 3 empty tiles above floor, floor stays CW for ground
+  for (const cor of corridors) {
+    for (let c = cor.left; c < cor.right; c++) {
+      setTile(grid, c, cor.y - 3, E); // headroom
+      setTile(grid, c, cor.y - 2, E); // headroom
+      setTile(grid, c, cor.y - 1, E); // walking space
     }
   }
 
-  // Carve corridors from maze grid
-  for (let my = 0; my < cellsY; my++) {
-    for (let mx = 0; mx < cellsX; mx++) {
-      // Carve cell (2x2 open space)
-      const gx = mazeLeft + mx * cellSize;
-      const gy = mazeTop + my * cellSize;
-      fillRect(grid, gx, gy, 2, 2, CF);
+  // Vertical shafts connecting corridors (open columns between levels)
+  const shafts = [
+    { col: 70, fromY: 3, toY: 26 },    // left shaft
+    { col: 71, fromY: 3, toY: 26 },
+    { col: 85, fromY: 3, toY: 21 },     // center-left shaft
+    { col: 86, fromY: 3, toY: 21 },
+    { col: 100, fromY: 8, toY: 26 },    // center shaft
+    { col: 101, fromY: 8, toY: 26 },
+    { col: 115, fromY: 3, toY: 26 },    // center-right shaft
+    { col: 116, fromY: 3, toY: 26 },
+    { col: 130, fromY: 8, toY: 26 },    // right shaft
+    { col: 131, fromY: 8, toY: 26 },
+    { col: 145, fromY: 3, toY: 26 },    // far-right shaft
+    { col: 146, fromY: 3, toY: 26 },
+  ];
 
-      // Carve passages
-      if (mx < cellsX - 1 && !walls.right[my][mx]) {
-        fillRect(grid, gx + 2, gy, 1, 2, CF);
-      }
-      if (my < cellsY - 1 && !walls.down[my][mx]) {
-        fillRect(grid, gx, gy + 2, 2, 1, CF);
+  for (const shaft of shafts) {
+    for (let r = shaft.fromY; r < shaft.toY; r++) {
+      setTile(grid, shaft.col, r, E);
+    }
+  }
+
+  // Add platforms in shafts so player can climb up/down
+  const shaftPlatCols = [70, 85, 100, 115, 130, 145];
+  for (const sc of shaftPlatCols) {
+    // Place one-way platforms at mid-points between corridors
+    for (let r = 5; r < 25; r += 3) {
+      if (getTile(grid, sc, r) === E && getTile(grid, sc, r + 1) === E) {
+        setTile(grid, sc, r, P);
+        setTile(grid, sc + 1, r, P);
       }
     }
   }
 
-  // Maze entrance (clear left wall)
-  fillRect(grid, mazeLeft, 10, 1, 3, CF);
+  // Dead-end alcoves with items (carved from walls)
+  // Alcove 1 (top-left dead end)
+  fillRect(grid, mazeLeft + 32, 3, 6, 3, E);
+  // Alcove 2 (middle dead end)
+  fillRect(grid, mazeLeft + 46, 13, 6, 3, E);
+  // Alcove 3 (lower right)
+  fillRect(grid, mazeRight - 8, 18, 6, 3, E);
 
-  // Maze exit (clear right wall)
-  fillRect(grid, mazeRight - 1, 14, 1, 3, CF);
+  // Maze entrance (left side, row 26 corridor)
+  fillRect(grid, mazeLeft, 23, 1, 3, E);
 
-  // Maze shortcut (breakable wall at col 100)
-  setTile(grid, 100, 12, B);
-  setTile(grid, 100, 13, B);
+  // Maze exit (right side, connecting to boss arena at row 14-17)
+  fillRect(grid, mazeRight - 1, 13, 1, 4, E);
+  fillRect(grid, mazeRight - 3, 13, 3, 3, E); // wider exit area
 
-  // SRB pattern in maze dead end (col 70-75, row 20-24)
-  // Clear area first
-  fillRect(grid, 70, 20, 8, 5, CF);
-  // S
-  setTile(grid, 70, 20, CW); setTile(grid, 71, 20, CW);
-  setTile(grid, 70, 21, CW);
-  setTile(grid, 70, 22, CW); setTile(grid, 71, 22, CW);
-  setTile(grid, 71, 23, CW);
-  setTile(grid, 70, 24, CW); setTile(grid, 71, 24, CW);
+  // Breakable shortcut wall (col 100, between corridors)
+  setTile(grid, 100, 6, B);
+  setTile(grid, 101, 6, B);
 
   // ---- Section C: Boss Arena (cols 150-199) ----
 
@@ -887,9 +892,10 @@ function generateLevel5() {
   items.push({ type: 'carrot', x: 44 * 16, y: 21 * 16 });
   items.push({ type: 'carrot', x: 51 * 16, y: 18 * 16 });
   items.push({ type: 'carrot', x: 45 * 16, y: 15 * 16 });
-  // Maze carrots (in various corridors)
+  // Maze carrots (placed in corridor walking spaces)
+  const corridorYs = [5, 10, 15, 20, 25]; // y-1 of each corridor floor
   for (let c = 62; c < 148; c += 8) {
-    const r = mazeTop + 1 + Math.floor(Math.random() * (mazeH - 3));
+    const r = corridorYs[Math.floor(Math.random() * corridorYs.length)];
     items.push({ type: 'carrot', x: c * 16, y: r * 16 });
   }
   // Maze item rooms

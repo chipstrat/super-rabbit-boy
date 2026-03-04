@@ -592,6 +592,46 @@ function drawFish(ctx, frame, flipX) {
   ctx.restore();
 }
 
+// ── Robo-Fish (armored mechanical fish) ──
+function drawRoboFish(ctx, frame, flipX) {
+  ctx.save();
+  if (flipX) { ctx.scale(-1, 1); ctx.translate(-16, 0); }
+  ctx.lineWidth = 1.2; ctx.strokeStyle = BLACK; ctx.lineJoin = 'round';
+  // Metal body
+  ctx.fillStyle = '#667788';
+  ctx.beginPath(); ctx.ellipse(8, 7, 6, 4, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  // Armor plates
+  ctx.fillStyle = '#556677';
+  ctx.beginPath(); ctx.moveTo(4, 4); ctx.lineTo(12, 4); ctx.lineTo(11, 7); ctx.lineTo(5, 7); ctx.closePath(); ctx.fill(); ctx.stroke();
+  // Belly (lighter metal)
+  ctx.fillStyle = '#889aaa';
+  ctx.beginPath(); ctx.ellipse(8, 9, 4, 2, 0, 0, Math.PI); ctx.fill();
+  // Tail fin (mechanical)
+  const tailW = frame === 0 ? 4 : 2;
+  ctx.fillStyle = '#445566';
+  ctx.beginPath(); ctx.moveTo(14, 7); ctx.lineTo(14 + tailW, 3); ctx.lineTo(14 + tailW, 11); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  // Rivets on tail
+  ctx.fillStyle = '#aabbcc';
+  ctx.beginPath(); ctx.arc(14 + tailW - 1, 5, 0.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(14 + tailW - 1, 9, 0.5, 0, Math.PI * 2); ctx.fill();
+  // Red eye (menacing)
+  ctx.fillStyle = '#ff2222';
+  ctx.beginPath(); ctx.arc(4, 6, 1.5, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#ff8888';
+  ctx.beginPath(); ctx.arc(4.3, 5.5, 0.4, 0, Math.PI * 2); ctx.fill();
+  // Antenna
+  ctx.strokeStyle = '#aabbcc'; ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.moveTo(8, 3); ctx.lineTo(8, 0.5); ctx.stroke();
+  ctx.fillStyle = '#ff2222';
+  ctx.beginPath(); ctx.arc(8, 0.5, 0.8, 0, Math.PI * 2); ctx.fill();
+  // Top fin (metal blade)
+  ctx.fillStyle = '#556677'; ctx.strokeStyle = BLACK; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(6, 3); ctx.lineTo(8, 0.5); ctx.lineTo(10, 3); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+
 // ── RoboSnake head ──
 function drawSnakeHead(ctx, flipX) {
   ctx.save();
@@ -739,6 +779,7 @@ export class SpriteRenderer {
       star: { frames: 1, draw: (ctx) => drawStar(ctx) },
       speed: { frames: 1, draw: (ctx) => drawSpeed(ctx) },
       fish: { frames: 2, draw: (ctx, frame, flipX) => drawFish(ctx, frame, flipX) },
+      robofish: { frames: 2, draw: (ctx, frame, flipX) => drawRoboFish(ctx, frame, flipX) },
       snakeHead: { frames: 1, draw: (ctx, frame, flipX) => drawSnakeHead(ctx, flipX) },
       snakeSegment: { frames: 1, draw: (ctx, frame, flipX) => drawSnakeSegment(ctx, flipX) },
     };

@@ -138,6 +138,80 @@ export class Fish {
   }
 }
 
+// Robo-Fish — armored, larger, homing charge, takes 2 stomps
+export class RoboFish {
+  constructor(x, y, patrolLeft, patrolRight) {
+    this.x = x; this.y = y; this.baseY = y;
+    this.w = 14; this.h = 10; this.vx = 0.8; this.vy = 0;
+    this.patrolLeft = patrolLeft; this.patrolRight = patrolRight;
+    this.facingRight = true; this.alive = true; this.deathTimer = 0;
+    this.sineTimer = Math.random() * Math.PI * 2;
+    this.animTimer = 0; this.animFrame = 0;
+    this.spriteOffsetX = -1; this.spriteOffsetY = -3;
+    this.onGround = false; this.wallLeft = false; this.wallRight = false; this.isDashing = false;
+    this.hp = 2;
+    this.chargeTimer = Math.floor(Math.random() * 90);
+    this.isCharging = false; this.chargeCountdown = 0;
+    this.stunTimer = 0;
+    this.targetY = y;
+  }
+
+  update(level, player) {
+    if (!this.alive) {
+      this.deathTimer--; this.vy += 0.1; this.y += this.vy;
+      return this.deathTimer > 0;
+    }
+    if (this.stunTimer > 0) {
+      this.stunTimer--;
+      return true;
+    }
+    // Horizontal patrol
+    this.x += this.vx;
+    if (this.x <= this.patrolLeft) { this.vx = Math.abs(this.vx); this.facingRight = true; }
+    else if (this.x + this.w >= this.patrolRight) { this.vx = -Math.abs(this.vx); this.facingRight = false; }
+    // Sine wave (tighter)
+    this.sineTimer += 0.04;
+    this.y = this.baseY + Math.sin(this.sineTimer) * 8;
+    // Homing charge attack
+    this.chargeTimer++;
+    if (this.isCharging) {
+      this.chargeCountdown--;
+      if (this.chargeCountdown <= 0) {
+        this.isCharging = false;
+        this.vx = this.facingRight ? 0.8 : -0.8;
+      }
+    } else if (this.chargeTimer > 120) {
+      this.chargeTimer = 0;
+      this.isCharging = true;
+      this.chargeCountdown = 40;
+      this.vx = this.facingRight ? 3.5 : -3.5;
+    }
+    // Animation
+    this.animTimer++;
+    if (this.animTimer >= 6) { this.animTimer = 0; this.animFrame = (this.animFrame + 1) % 2; }
+    return true;
+  }
+
+  getHitbox() { return { x: this.x, y: this.y, w: this.w, h: this.h }; }
+
+  stomp() {
+    this.hp--;
+    this.stunTimer = 30;
+    this.vx = 0;
+    if (this.hp <= 0) {
+      this.alive = false; this.deathTimer = 25; this.vy = 0.5;
+    }
+  }
+
+  draw(ctx, spriteRenderer, camera) {
+    if (!camera.isVisible(this.x - 1, this.y - 3, 16, 16)) return;
+    if (!this.alive) ctx.globalAlpha = this.deathTimer / 25;
+    if (this.stunTimer > 0 && Math.floor(this.stunTimer / 3) % 2) ctx.globalAlpha = 0.4;
+    spriteRenderer.draw(ctx, 'robofish', Math.floor(this.x + this.spriteOffsetX), Math.floor(this.y + this.spriteOffsetY), this.animFrame, this.facingRight);
+    ctx.globalAlpha = 1;
+  }
+}
+
 // King Fox Boss (Level 1)
 export class KingFox {
   constructor(x, y) {
@@ -557,6 +631,7 @@ export function createEnemies(enemyData) {
       case 'fox': return new Fox(e.x, e.y, e.patrolLeft, e.patrolRight);
       case 'bird': return new Bird(e.x, e.y, e.patrolLeft, e.patrolRight);
       case 'fish': return new Fish(e.x, e.y, e.patrolLeft, e.patrolRight);
+      case 'robofish': return new RoboFish(e.x, e.y, e.patrolLeft, e.patrolRight);
       default: return null;
     }
   }).filter(Boolean);
