@@ -1,7 +1,7 @@
 // Main — game loop entry point
 
-import { Game } from './game.js';
-import { Input } from './input.js';
+import { Game } from './game.js?v=3';
+import { Input } from './input.js?v=3';
 
 const canvas = document.getElementById('game-canvas');
 const game = new Game(canvas);

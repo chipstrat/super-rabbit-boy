@@ -1,6 +1,6 @@
 // Items — collectibles and power-ups
 
-import { aabbOverlap } from './physics.js';
+import { aabbOverlap } from './physics.js?v=3';
 
 export class Item {
   constructor(type, x, y) {

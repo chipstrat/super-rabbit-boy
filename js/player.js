@@ -1,6 +1,6 @@
 // Super Rabbit Boy — player character
 
-import { TILE_SIZE, moveEntity, isWater, isQuicksand, WATER_SWIM_FORCE, QUICKSAND_ESCAPE_FORCE } from './physics.js';
+import { TILE_SIZE, moveEntity, isWater, isQuicksand, WATER_SWIM_FORCE, QUICKSAND_ESCAPE_FORCE } from './physics.js?v=3';
 
 const MOVE_SPEED = 2;
 const DASH_SPEED = 3.5;

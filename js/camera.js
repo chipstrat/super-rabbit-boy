@@ -1,6 +1,6 @@
 // Smooth scrolling camera that follows the player
 
-import { TILE_SIZE } from './physics.js';
+import { TILE_SIZE } from './physics.js?v=3';
 
 export class Camera {
   constructor(viewWidth, viewHeight) {

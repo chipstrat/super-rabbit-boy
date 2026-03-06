@@ -1,6 +1,6 @@
 // Enemies — Fox, Bird, Fish, RoboSnake, KingFox, KingViking
 
-import { TILE_SIZE, aabbOverlap, moveEntity } from './physics.js';
+import { TILE_SIZE, aabbOverlap, moveEntity } from './physics.js?v=3';
 
 export class Fox {
   constructor(x, y, patrolLeft, patrolRight) {

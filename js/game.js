@@ -1,14 +1,14 @@
 // Game — state management, scene transitions, collision handling, level progression
 
-import { Player } from './player.js';
-import { Camera } from './camera.js';
-import { Level } from './level.js';
-import { HUD } from './hud.js';
-import { SpriteRenderer } from './sprites.js';
-import { Audio } from './audio.js';
-import { createEnemies, KingFox, RoboSnake, KingViking } from './enemies.js';
-import { createItems, createCheckpoints } from './items.js';
-import { aabbOverlap, TILE_SIZE } from './physics.js';
+import { Player } from './player.js?v=3';
+import { Camera } from './camera.js?v=3';
+import { Level } from './level.js?v=3';
+import { HUD } from './hud.js?v=3';
+import { SpriteRenderer } from './sprites.js?v=3';
+import { Audio } from './audio.js?v=3';
+import { createEnemies, KingFox, RoboSnake, KingViking } from './enemies.js?v=3';
+import { createItems, createCheckpoints } from './items.js?v=3';
+import { aabbOverlap, TILE_SIZE } from './physics.js?v=3';
 
 export const VIEW_WIDTH = 256;
 export const VIEW_HEIGHT = 224;

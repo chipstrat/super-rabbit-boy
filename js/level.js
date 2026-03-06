@@ -1,6 +1,6 @@
 // Level — tile map loader and renderer with per-level backgrounds
 
-import { TILE_SIZE } from './physics.js';
+import { TILE_SIZE } from './physics.js?v=3';
 
 // Tile type constants
 export const TILES = {
